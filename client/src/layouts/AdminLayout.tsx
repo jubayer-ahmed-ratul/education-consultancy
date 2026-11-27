@@ -183,7 +183,7 @@ export default function AdminLayout() {
           </span>
           {!isCollapsed && (
             <div className="flex items-center gap-2 truncate">
-              <span className="text-sm font-bold tracking-tight text-zinc-950">Zero Compile</span>
+              <span className="text-sm font-bold tracking-tight text-black">Zero Compile</span>
               <span className="rounded-md bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-700 ring-1 ring-inset ring-teal-200">
                 Admin
               </span>
@@ -203,7 +203,7 @@ export default function AdminLayout() {
                   onClick={() =>
                     setCollapsedGroups((prev) => ({ ...prev, [group.title]: !prev[group.title] }))
                   }
-                  className="flex w-full items-center justify-between px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-zinc-600 hover:text-zinc-950 cursor-pointer"
+                  className="flex w-full items-center justify-between px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-black hover:text-black cursor-pointer"
                 >
                   <span>{group.title}</span>
                   {isGroupCollapsed ? (
@@ -230,7 +230,7 @@ export default function AdminLayout() {
                             `group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                               isActive
                                 ? 'bg-teal-50 text-teal-700 font-semibold'
-                                : 'text-zinc-950 hover:bg-zinc-100'
+                                : 'text-black hover:bg-zinc-100'
                             }`
                           }
                         >
@@ -239,7 +239,7 @@ export default function AdminLayout() {
                               <span className="flex items-center gap-3 min-w-0">
                                 <Icon
                                   className={`h-4 w-4 shrink-0 ${
-                                    isActive ? 'text-teal-600' : 'text-zinc-700 group-hover:text-zinc-950'
+                                    isActive ? 'text-teal-600' : 'text-black'
                                   }`}
                                 />
                                 {!isCollapsed && <span className="truncate">{item.label}</span>}
@@ -267,7 +267,7 @@ export default function AdminLayout() {
           <Avatar name={user?.name || 'Admin'} className="bg-teal-600 text-white" />
           {!isCollapsed && (
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-bold text-zinc-950">{user?.name}</div>
+              <div className="truncate text-xs font-bold text-black">{user?.name}</div>
               <Badge
                 variant={user?.role === 'super-admin' ? 'success' : 'secondary'}
                 className="mt-0.5 text-[10px]"
@@ -277,8 +277,8 @@ export default function AdminLayout() {
             </div>
           )}
         </div>
-        <Button variant="secondary" size="sm" onClick={handleLogout} className="w-full justify-center">
-          <LogOut className="h-3.5 w-3.5 text-zinc-700" />
+        <Button variant="secondary" size="sm" onClick={handleLogout} className="w-full justify-center text-black">
+          <LogOut className="h-3.5 w-3.5 text-black" />
           {!isCollapsed && <span>Sign out</span>}
         </Button>
       </div>
