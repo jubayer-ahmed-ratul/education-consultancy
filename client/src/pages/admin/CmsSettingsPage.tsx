@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { RefreshCw, Save } from 'lucide-react';
+import { ChevronRight, RefreshCw, Save } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
@@ -90,15 +90,17 @@ export default function CmsSettingsPage() {
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>Site Settings — Zero Compile Admin</title>
+        <title>Page Content & Settings — Zero Compile Admin</title>
       </Helmet>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-[#111827]">CMS Singleton Settings</h1>
-          <p className="text-xs text-[#6B7280]">
-            Structured editor for all 9 global CMS singletons with Zod schema validation.
-          </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+            <span>Settings</span>
+            <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+            <span className="text-gray-900">CMS Singletons</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-950">Page Content & Settings</h1>
         </div>
         <Button
           variant="secondary"
@@ -106,7 +108,7 @@ export default function CmsSettingsPage() {
           onClick={() => revalidateMutation.mutate()}
           disabled={revalidateMutation.isPending}
         >
-          <RefreshCw className="h-3.5 w-3.5" />
+          <RefreshCw className="h-3.5 w-3.5 text-teal-600" />
           {revalidateMutation.isPending ? 'Purging...' : 'Purge All Cache'}
         </Button>
       </div>
@@ -125,20 +127,22 @@ export default function CmsSettingsPage() {
             <CardHeader className="flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="capitalize">{activeTab.replace(/[-/]/g, ' ')}</CardTitle>
-                <CardDescription>Endpoint: <code>PUT /api/admin/content/{activeTab}</code></CardDescription>
+                <CardDescription>
+                  Endpoint: <code>PUT /api/admin/content/{activeTab}</code>
+                </CardDescription>
               </div>
               {isDirty && <Badge variant="amber">Unsaved Changes</Badge>}
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="text-sm text-[#6B7280]">Loading configuration...</div>
+                <div className="text-sm text-gray-500">Loading configuration...</div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <Textarea
                     rows={18}
                     value={jsonText}
                     onChange={(e) => setJsonText(e.target.value)}
-                    className="bg-[#FAF9F6] font-mono text-xs"
+                    className="bg-gray-50 font-mono text-xs"
                   />
                   <div className="flex justify-end gap-2">
                     {isDirty && (
@@ -148,7 +152,7 @@ export default function CmsSettingsPage() {
                     )}
                     <Button type="submit" disabled={saveMutation.isPending}>
                       <Save className="h-3.5 w-3.5" />
-                      {saveMutation.isPending ? 'Saving...' : 'Save Configuration'}
+                      {saveMutation.isPending ? 'Saving...' : 'Save changes'}
                     </Button>
                   </div>
                 </form>

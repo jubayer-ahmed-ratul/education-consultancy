@@ -1,11 +1,10 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronRight, Plus } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { DataTable } from '../../components/admin/DataTable';
 import { ImageUploadField } from '../../components/admin/ImageUploadField';
-import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { Input } from '../../components/ui/input';
@@ -55,6 +54,7 @@ export default function CountriesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CountryRecord | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [createAnother, setCreateAnother] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.countries.adminList({ page: 1, limit: 100 }),
@@ -67,19 +67,29 @@ export default function CountriesPage() {
         ? apiRequest(`/countries/${editingId}`, { method: 'PUT', body: JSON.stringify(payload) })
         : apiRequest('/countries', { method: 'POST', body: JSON.stringify(payload) }),
     onSuccess: () => {
-      addToast('success', editingId ? 'Destination updated.' : 'Destination created.');
-      setSheetOpen(false);
+      addToast('success', editingId ? 'Country updated.' : 'Country created.');
       setEditingId(null);
       setForm(EMPTY_FORM);
+      if (!createAnother) setSheetOpen(false);
+      setCreateAnother(false);
       void queryClient.invalidateQueries({ queryKey: queryKeys.countries.all });
     },
     onError: (err) => addToast('error', err instanceof Error ? err.message : 'Save failed.'),
   });
 
+  const togglePublishMutation = useMutation({
+    mutationFn: ({ id, isPublished }: { id: string; isPublished: boolean }) =>
+      apiRequest(`/countries/${id}`, { method: 'PUT', body: JSON.stringify({ isPublished }) }),
+    onSuccess: () => {
+      addToast('success', 'Visibility updated.');
+      void queryClient.invalidateQueries({ queryKey: queryKeys.countries.all });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiRequest(`/countries/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
-      addToast('success', 'Destination deleted.');
+      addToast('success', 'Country deleted.');
       setDeleteTarget(null);
       void queryClient.invalidateQueries({ queryKey: queryKeys.countries.all });
     },
@@ -157,34 +167,51 @@ export default function CountriesPage() {
         accessorKey: 'order',
         header: 'Order',
         cell: ({ row }) => (
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono text-xs">{row.original.order}</span>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveOrder(row.index, -1)}>
+          <div className="flex items-center gap-1">
+            <span className="font-mono text-xs tabular-nums text-gray-600">{row.original.order}</span>
+            <button type="button" onClick={() => moveOrder(row.index, -1)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-teal-600 cursor-pointer">
               <ArrowUp className="h-3 w-3" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveOrder(row.index, 1)}>
+            </button>
+            <button type="button" onClick={() => moveOrder(row.index, 1)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-teal-600 cursor-pointer">
               <ArrowDown className="h-3 w-3" />
-            </Button>
+            </button>
           </div>
         ),
       },
       {
         accessorKey: 'name',
         header: 'Country',
-        cell: ({ row }) => <span className="font-semibold text-[#111827]">{row.original.name}</span>,
+        cell: ({ row }) => <span className="font-semibold text-gray-950">{row.original.name}</span>,
       },
       {
         accessorKey: 'slug',
         header: 'Slug',
-        cell: ({ row }) => <code className="text-xs text-[#6B7280]">{row.original.slug}</code>,
+        cell: ({ row }) => <code className="text-xs text-gray-500">{row.original.slug}</code>,
       },
       {
         accessorKey: 'isPublished',
-        header: 'Status',
+        header: 'Published',
         cell: ({ row }) => (
-          <Badge variant={row.original.isPublished ? 'success' : 'secondary'}>
-            {row.original.isPublished ? 'Published' : 'Draft'}
-          </Badge>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={row.original.isPublished}
+            onClick={() =>
+              togglePublishMutation.mutate({
+                id: row.original.id,
+                isPublished: !row.original.isPublished,
+              })
+            }
+            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
+              row.original.isPublished ? 'bg-teal-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition ${
+                row.original.isPublished ? 'translate-x-4' : 'translate-x-0'
+              }`}
+            />
+          </button>
         ),
       },
       {
@@ -192,13 +219,13 @@ export default function CountriesPage() {
         header: '',
         enableSorting: false,
         cell: ({ row }) => (
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" size="sm" onClick={() => startEdit(row.original)}>
+          <div className="flex justify-end gap-3 text-xs font-semibold">
+            <button type="button" onClick={() => startEdit(row.original)} className="text-teal-600 hover:text-teal-700 cursor-pointer">
               Edit
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-600" onClick={() => setDeleteTarget(row.original)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
+            </button>
+            <button type="button" onClick={() => setDeleteTarget(row.original)} className="text-rose-600 hover:text-rose-700 cursor-pointer">
+              Delete
+            </button>
           </div>
         ),
       },
@@ -207,50 +234,93 @@ export default function CountriesPage() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Helmet>
-        <title>Destinations — Zero Compile Admin</title>
+        <title>Countries — Zero Compile Admin</title>
       </Helmet>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-[#111827]">Study Destinations</h1>
-          <p className="text-xs text-[#6B7280]">Manage country profiles, requirements, and display order.</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+            <span>Countries</span>
+            <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+            <span className="text-gray-900">List</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-950">Countries</h1>
         </div>
         <Button onClick={openCreate}>
-          <Plus className="h-4 w-4" /> Add Destination
+          <Plus className="h-4 w-4" /> New Country
         </Button>
       </div>
 
-      <DataTable columns={columns} data={data?.data ?? []} isLoading={isLoading} emptyMessage="No destinations created yet." />
+      <DataTable columns={columns} data={data?.data ?? []} isLoading={isLoading} emptyMessage="No countries created yet." />
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent>
+        <SheetContent className="sm:max-w-2xl">
           <SheetHeader>
-            <SheetTitle>{editingId ? 'Edit Destination' : 'New Destination'}</SheetTitle>
+            <SheetTitle>{editingId ? 'Edit Country' : 'Create Country'}</SheetTitle>
           </SheetHeader>
-          <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto p-6">
-            <div className="grid grid-cols-2 gap-3">
-              <Input required placeholder="Country Name *" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-              <Input placeholder="Slug (auto if blank)" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+          <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex-1 space-y-5 overflow-y-auto p-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-700">Name *</label>
+                  <Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-700">Slug (auto if blank)</label>
+                  <Input value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium text-gray-700">Overview Description *</label>
+                <Textarea required rows={3} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-700">Highlights (comma-separated)</label>
+                  <Input value={form.highlightsText} onChange={(e) => setForm((f) => ({ ...f, highlightsText: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-700">Intakes (comma-separated)</label>
+                  <Input value={form.intakesText} onChange={(e) => setForm((f) => ({ ...f, intakesText: e.target.value }))} />
+                </div>
+              </div>
+
+              <ImageUploadField label="Cover Image" value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} purpose="country-cover" />
+              {form.imageUrl && <img src={form.imageUrl} alt="Preview" className="h-32 w-full rounded-lg border object-cover" />}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Textarea rows={2} placeholder="Education System" value={form.educationSystem} onChange={(e) => setForm((f) => ({ ...f, educationSystem: e.target.value }))} />
+                <Textarea rows={2} placeholder="Admission Requirements" value={form.admissionRequirements} onChange={(e) => setForm((f) => ({ ...f, admissionRequirements: e.target.value }))} />
+                <Textarea rows={2} placeholder="Tuition & Living Costs" value={form.tuitionAndLivingCosts} onChange={(e) => setForm((f) => ({ ...f, tuitionAndLivingCosts: e.target.value }))} />
+                <Textarea rows={2} placeholder="Visa Requirements" value={form.visaRequirements} onChange={(e) => setForm((f) => ({ ...f, visaRequirements: e.target.value }))} />
+              </div>
+              <Textarea rows={2} placeholder="Scholarship Info" value={form.scholarshipInfo} onChange={(e) => setForm((f) => ({ ...f, scholarshipInfo: e.target.value }))} />
+
+              <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-950/5 flex items-center justify-between">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 cursor-pointer">
+                  <input type="checkbox" checked={form.isPublished} onChange={(e) => setForm((f) => ({ ...f, isPublished: e.target.checked }))} className="h-4 w-4 accent-teal-600" />
+                  Published on public portal
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">Order</span>
+                  <Input type="number" className="w-20" value={form.order} onChange={(e) => setForm((f) => ({ ...f, order: Number(e.target.value) }))} />
+                </div>
+              </div>
             </div>
-            <Textarea required rows={3} placeholder="Description *" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
-            <Input placeholder="Highlights (comma-separated)" value={form.highlightsText} onChange={(e) => setForm((f) => ({ ...f, highlightsText: e.target.value }))} />
-            <Input placeholder="Intakes (comma-separated)" value={form.intakesText} onChange={(e) => setForm((f) => ({ ...f, intakesText: e.target.value }))} />
-            <ImageUploadField label="Cover Image" value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} purpose="country-cover" />
-            {form.imageUrl && <img src={form.imageUrl} alt="Preview" className="h-28 w-full rounded border object-cover" />}
-            <Textarea rows={2} placeholder="Education System" value={form.educationSystem} onChange={(e) => setForm((f) => ({ ...f, educationSystem: e.target.value }))} />
-            <Textarea rows={2} placeholder="Admission Requirements" value={form.admissionRequirements} onChange={(e) => setForm((f) => ({ ...f, admissionRequirements: e.target.value }))} />
-            <Textarea rows={2} placeholder="Tuition & Living Costs" value={form.tuitionAndLivingCosts} onChange={(e) => setForm((f) => ({ ...f, tuitionAndLivingCosts: e.target.value }))} />
-            <Textarea rows={2} placeholder="Visa Requirements" value={form.visaRequirements} onChange={(e) => setForm((f) => ({ ...f, visaRequirements: e.target.value }))} />
-            <Textarea rows={2} placeholder="Scholarship Info" value={form.scholarshipInfo} onChange={(e) => setForm((f) => ({ ...f, scholarshipInfo: e.target.value }))} />
-            <div className="flex items-center justify-between pt-2">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={form.isPublished} onChange={(e) => setForm((f) => ({ ...f, isPublished: e.target.checked }))} />
-                Published
-              </label>
-              <Button type="submit" disabled={saveMutation.isPending}>
-                {saveMutation.isPending ? 'Saving...' : 'Save Destination'}
+
+            <div className="flex items-center justify-end gap-2.5 border-t border-gray-950/5 bg-gray-50 px-6 py-4">
+              <Button type="button" variant="secondary" onClick={() => setSheetOpen(false)}>Cancel</Button>
+              {!editingId && (
+                <Button type="submit" variant="secondary" disabled={saveMutation.isPending} onClick={() => setCreateAnother(true)}>
+                  Save & create another
+                </Button>
+              )}
+              <Button type="submit" disabled={saveMutation.isPending} onClick={() => setCreateAnother(false)}>
+                {saveMutation.isPending ? 'Saving...' : 'Save changes'}
               </Button>
             </div>
           </form>
@@ -261,12 +331,12 @@ export default function CountriesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete {deleteTarget?.name}?</DialogTitle>
-            <DialogDescription>This action cannot be undone. Destinations with linked universities cannot be deleted.</DialogDescription>
+            <DialogDescription>Countries with linked universities cannot be deleted.</DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setDeleteTarget(null)}>Cancel</Button>
             <Button variant="destructive" disabled={deleteMutation.isPending} onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}>
-              Confirm Delete
+              Delete
             </Button>
           </div>
         </DialogContent>

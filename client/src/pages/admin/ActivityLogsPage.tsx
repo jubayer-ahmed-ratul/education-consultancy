@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { type ColumnDef } from '@tanstack/react-table';
+import { ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { DataTable } from '../../components/admin/DataTable';
 import { Badge } from '../../components/ui/badge';
@@ -40,7 +41,7 @@ export default function ActivityLogsPage() {
         accessorKey: 'createdAt',
         header: 'Timestamp',
         cell: ({ row }) => (
-          <span className="font-mono text-xs text-[#6B7280] whitespace-nowrap">
+          <span className="font-mono text-xs tabular-nums text-gray-500 whitespace-nowrap">
             {new Date(row.original.createdAt).toLocaleString()}
           </span>
         ),
@@ -48,7 +49,7 @@ export default function ActivityLogsPage() {
       {
         accessorKey: 'action',
         header: 'Action',
-        cell: ({ row }) => <code className="text-xs font-semibold text-[#0D3B2E]">{row.original.action}</code>,
+        cell: ({ row }) => <code className="text-xs font-semibold text-teal-700">{row.original.action}</code>,
       },
       {
         accessorKey: 'entityType',
@@ -56,7 +57,7 @@ export default function ActivityLogsPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-1.5">
             <Badge variant="outline">{row.original.entityType}</Badge>
-            <span className="font-mono text-[11px] text-[#6B7280]">{row.original.entityId.slice(0, 8)}</span>
+            <span className="font-mono text-[11px] text-gray-400">{row.original.entityId.slice(0, 8)}</span>
           </div>
         ),
       },
@@ -65,7 +66,7 @@ export default function ActivityLogsPage() {
         header: 'Actor',
         accessorFn: (r) => r.performedBy?.email ?? 'Public / System',
         cell: ({ row }) => (
-          <span className="text-xs text-[#4B5563]">{row.original.performedBy?.email ?? 'Public / System'}</span>
+          <span className="text-xs text-gray-600">{row.original.performedBy?.email ?? 'Public / System'}</span>
         ),
       },
       {
@@ -73,7 +74,7 @@ export default function ActivityLogsPage() {
         header: 'Redacted Details',
         enableSorting: false,
         cell: ({ row }) => (
-          <code className="block max-w-md truncate text-[11px] text-[#6B7280]">
+          <code className="block max-w-md truncate text-[11px] text-gray-500">
             {JSON.stringify(row.original.details)}
           </code>
         ),
@@ -83,14 +84,18 @@ export default function ActivityLogsPage() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Helmet>
-        <title>Audit Logs — Zero Compile Admin</title>
+        <title>Activity Logs — Zero Compile Admin</title>
       </Helmet>
 
-      <div>
-        <h1 className="font-display text-2xl font-bold text-[#111827]">Immutable System Audit Logs</h1>
-        <p className="text-xs text-[#6B7280]">Append-only trail with automatic PII and credential redaction.</p>
+      <div className="space-y-1">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+          <span>Activity Logs</span>
+          <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+          <span className="text-gray-900">List</span>
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-950">Activity Logs</h1>
       </div>
 
       <DataTable

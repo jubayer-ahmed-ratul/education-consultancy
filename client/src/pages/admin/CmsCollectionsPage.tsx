@@ -1,11 +1,10 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronRight, Plus } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { DataTable } from '../../components/admin/DataTable';
 import { ImageUploadField } from '../../components/admin/ImageUploadField';
-import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { Input } from '../../components/ui/input';
@@ -19,10 +18,10 @@ import { queryKeys } from '../../lib/query-keys';
 export type CmsCollectionKind = 'blogs' | 'events' | 'success-stories' | 'gallery' | 'sister-concerns';
 
 const TITLES: Record<CmsCollectionKind, string> = {
-  blogs: 'Blogs & Study Guides',
-  events: 'Educational Events',
-  'success-stories': 'Student Success Stories',
-  gallery: 'Media Gallery Items',
+  blogs: 'Blogs',
+  events: 'Events',
+  'success-stories': 'Success Stories',
+  gallery: 'Gallery',
   'sister-concerns': 'Sister Concerns',
 };
 
@@ -54,6 +53,15 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
       void queryClient.invalidateQueries({ queryKey: queryKeys.cms.section(kind) });
     },
     onError: (err) => addToast('error', err instanceof Error ? err.message : 'Save failed.'),
+  });
+
+  const togglePublishMutation = useMutation({
+    mutationFn: ({ id, isPublished }: { id: string; isPublished: boolean }) =>
+      apiRequest(`${endpoint}/${id}`, { method: 'PUT', body: JSON.stringify({ isPublished }) }),
+    onSuccess: () => {
+      addToast('success', 'Visibility updated.');
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cms.section(kind) });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -150,41 +158,63 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
         header: 'Title / Name',
         accessorFn: (r) => String(r.title ?? r.name ?? ''),
         cell: ({ row }) => (
-          <span className="font-semibold text-[#111827]">
+          <span className="font-semibold text-gray-950">
             {String(row.original.title ?? row.original.name)}
           </span>
         ),
       },
       {
         id: 'status',
-        header: 'Status',
+        header: 'Published',
         accessorFn: (r) => (r.isPublished ? 'Published' : 'Draft'),
-        cell: ({ row }) => (
-          <Badge variant={row.original.isPublished ? 'success' : 'secondary'}>
-            {row.original.isPublished ? 'Published' : 'Draft'}
-          </Badge>
-        ),
+        cell: ({ row }) => {
+          const isPub = Boolean(row.original.isPublished);
+          return (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isPub}
+              onClick={() =>
+                togglePublishMutation.mutate({
+                  id: String(row.original.id),
+                  isPublished: !isPub,
+                })
+              }
+              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
+                isPub ? 'bg-teal-600' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition ${
+                  isPub ? 'translate-x-4' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          );
+        },
       },
       {
         id: 'actions',
         header: '',
         enableSorting: false,
         cell: ({ row }) => (
-          <div className="flex justify-end gap-1.5">
+          <div className="flex justify-end items-center gap-3 text-xs font-semibold">
             {kind === 'success-stories' && (
-              <>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => moveStory(row.index, -1)}>
+              <span className="flex items-center gap-1">
+                <button type="button" onClick={() => moveStory(row.index, -1)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-teal-600 cursor-pointer">
                   <ArrowUp className="h-3.5 w-3.5" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => moveStory(row.index, 1)}>
+                </button>
+                <button type="button" onClick={() => moveStory(row.index, 1)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-teal-600 cursor-pointer">
                   <ArrowDown className="h-3.5 w-3.5" />
-                </Button>
-              </>
+                </button>
+              </span>
             )}
-            <Button variant="secondary" size="sm" onClick={() => startEdit(row.original)}>Edit</Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-600" onClick={() => setDeleteTarget(row.original)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
+            <button type="button" onClick={() => startEdit(row.original)} className="text-teal-600 hover:text-teal-700 cursor-pointer">
+              Edit
+            </button>
+            <button type="button" onClick={() => setDeleteTarget(row.original)} className="text-rose-600 hover:text-rose-700 cursor-pointer">
+              Delete
+            </button>
           </div>
         ),
       },
@@ -193,103 +223,112 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Helmet>
         <title>{TITLES[kind]} — Zero Compile Admin</title>
       </Helmet>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-[#111827]">{TITLES[kind]}</h1>
-          <p className="text-xs text-[#6B7280]">Create, edit, publish, and organize CMS entries.</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+            <span>{TITLES[kind]}</span>
+            <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+            <span className="text-gray-900">List</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-950">{TITLES[kind]}</h1>
         </div>
         <Button onClick={openCreate}>
-          <Plus className="h-4 w-4" /> Create New
+          <Plus className="h-4 w-4" /> New {TITLES[kind]}
         </Button>
       </div>
 
       <DataTable columns={columns} data={data?.data ?? []} isLoading={isLoading} />
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent>
+        <SheetContent className="sm:max-w-2xl">
           <SheetHeader>
-            <SheetTitle>{editingId ? `Edit ${TITLES[kind]}` : `New ${TITLES[kind]}`}</SheetTitle>
+            <SheetTitle>{editingId ? `Edit ${TITLES[kind]}` : `Create ${TITLES[kind]}`}</SheetTitle>
           </SheetHeader>
-          <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto p-6">
-            {kind === 'blogs' && (
-              <>
-                <Input required placeholder="Blog Title *" value={val('title')} onChange={(e) => setField('title', e.target.value)} />
-                <div className="grid grid-cols-2 gap-3">
-                  <Input placeholder="Category" value={val('category', 'Study Abroad Guide')} onChange={(e) => setField('category', e.target.value)} />
-                  <Input placeholder="Author" value={val('author', 'Zero Compile Editorial Desk')} onChange={(e) => setField('author', e.target.value)} />
-                </div>
-                <Input required placeholder="Excerpt *" value={val('excerpt')} onChange={(e) => setField('excerpt', e.target.value)} />
-                <Textarea required rows={6} placeholder="Full Content *" value={val('content')} onChange={(e) => setField('content', e.target.value)} />
-              </>
-            )}
+          <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-6">
+              {kind === 'blogs' && (
+                <>
+                  <Input required placeholder="Blog Title *" value={val('title')} onChange={(e) => setField('title', e.target.value)} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input placeholder="Category" value={val('category', 'Study Abroad Guide')} onChange={(e) => setField('category', e.target.value)} />
+                    <Input placeholder="Author" value={val('author', 'Zero Compile Editorial Desk')} onChange={(e) => setField('author', e.target.value)} />
+                  </div>
+                  <Input required placeholder="Excerpt *" value={val('excerpt')} onChange={(e) => setField('excerpt', e.target.value)} />
+                  <Textarea required rows={6} placeholder="Full Content *" value={val('content')} onChange={(e) => setField('content', e.target.value)} />
+                </>
+              )}
 
-            {kind === 'events' && (
-              <>
-                <Input required placeholder="Event Title *" value={val('title')} onChange={(e) => setField('title', e.target.value)} />
-                <div className="grid grid-cols-2 gap-3">
-                  <Input type="date" required value={val('eventDate')} onChange={(e) => setField('eventDate', e.target.value)} />
-                  <Select value={val('locationType', 'in-person')} onChange={(e) => setField('locationType', e.target.value)}>
-                    <option value="in-person">in-person</option>
-                    <option value="online">online</option>
-                    <option value="hybrid">hybrid</option>
-                  </Select>
-                </div>
-                <Input required placeholder="Venue *" value={val('venue')} onChange={(e) => setField('venue', e.target.value)} />
-                <Input type="url" placeholder="Registration URL" value={val('registrationUrl')} onChange={(e) => setField('registrationUrl', e.target.value || null)} />
-                <Input required placeholder="Short Description *" value={val('shortDescription')} onChange={(e) => setField('shortDescription', e.target.value)} />
-                <Textarea required rows={4} placeholder="Full Description *" value={val('fullDescription')} onChange={(e) => setField('fullDescription', e.target.value)} />
-              </>
-            )}
+              {kind === 'events' && (
+                <>
+                  <Input required placeholder="Event Title *" value={val('title')} onChange={(e) => setField('title', e.target.value)} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input type="date" required value={val('eventDate')} onChange={(e) => setField('eventDate', e.target.value)} />
+                    <Select value={val('locationType', 'in-person')} onChange={(e) => setField('locationType', e.target.value)}>
+                      <option value="in-person">in-person</option>
+                      <option value="online">online</option>
+                      <option value="hybrid">hybrid</option>
+                    </Select>
+                  </div>
+                  <Input required placeholder="Venue *" value={val('venue')} onChange={(e) => setField('venue', e.target.value)} />
+                  <Input type="url" placeholder="Registration URL" value={val('registrationUrl')} onChange={(e) => setField('registrationUrl', e.target.value || null)} />
+                  <Input required placeholder="Short Description *" value={val('shortDescription')} onChange={(e) => setField('shortDescription', e.target.value)} />
+                  <Textarea required rows={4} placeholder="Full Description *" value={val('fullDescription')} onChange={(e) => setField('fullDescription', e.target.value)} />
+                </>
+              )}
 
-            {kind === 'success-stories' && (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <Input required placeholder="Student Name *" value={val('name')} onChange={(e) => setField('name', e.target.value)} />
-                  <Input required placeholder="Country *" value={val('country')} onChange={(e) => setField('country', e.target.value)} />
-                  <Input required placeholder="University *" value={val('university')} onChange={(e) => setField('university', e.target.value)} />
-                  <Input required placeholder="Program *" value={val('program')} onChange={(e) => setField('program', e.target.value)} />
-                </div>
-                <Input placeholder="Achievement" value={val('achievement')} onChange={(e) => setField('achievement', e.target.value)} />
-                <Input placeholder="YouTube URL" value={val('youtubeUrl')} onChange={(e) => setField('youtubeUrl', e.target.value)} />
-                <ImageUploadField label="Student Photo" value={val('studentImage')} onChange={(u) => setField('studentImage', u)} purpose="success-story" />
-                <Textarea required rows={4} placeholder="Testimonial *" value={val('testimonial')} onChange={(e) => setField('testimonial', e.target.value)} />
-              </>
-            )}
+              {kind === 'success-stories' && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input required placeholder="Student Name *" value={val('name')} onChange={(e) => setField('name', e.target.value)} />
+                    <Input required placeholder="Country *" value={val('country')} onChange={(e) => setField('country', e.target.value)} />
+                    <Input required placeholder="University *" value={val('university')} onChange={(e) => setField('university', e.target.value)} />
+                    <Input required placeholder="Program *" value={val('program')} onChange={(e) => setField('program', e.target.value)} />
+                  </div>
+                  <Input placeholder="Achievement" value={val('achievement')} onChange={(e) => setField('achievement', e.target.value)} />
+                  <Input placeholder="YouTube URL" value={val('youtubeUrl')} onChange={(e) => setField('youtubeUrl', e.target.value)} />
+                  <ImageUploadField label="Student Photo" value={val('studentImage')} onChange={(u) => setField('studentImage', u)} purpose="success-story" />
+                  <Textarea required rows={4} placeholder="Testimonial *" value={val('testimonial')} onChange={(e) => setField('testimonial', e.target.value)} />
+                </>
+              )}
 
-            {kind === 'gallery' && (
-              <>
-                <Input required placeholder="Title *" value={val('title')} onChange={(e) => setField('title', e.target.value)} />
-                <ImageUploadField label="Image URL *" value={val('imageUrl')} onChange={(u) => setField('imageUrl', u)} purpose="gallery-item" />
-                {val('imageUrl') && <img src={val('imageUrl')} alt="Preview" className="h-32 w-full rounded border object-cover" />}
-                <Input placeholder="Description" value={val('description')} onChange={(e) => setField('description', e.target.value)} />
-              </>
-            )}
+              {kind === 'gallery' && (
+                <>
+                  <Input required placeholder="Title *" value={val('title')} onChange={(e) => setField('title', e.target.value)} />
+                  <ImageUploadField label="Image URL *" value={val('imageUrl')} onChange={(u) => setField('imageUrl', u)} purpose="gallery-item" />
+                  {val('imageUrl') && <img src={val('imageUrl')} alt="Preview" className="h-32 w-full rounded-lg border object-cover" />}
+                  <Input placeholder="Description" value={val('description')} onChange={(e) => setField('description', e.target.value)} />
+                </>
+              )}
 
-            {kind === 'sister-concerns' && (
-              <>
-                <Input required placeholder="Company Name *" value={val('name')} onChange={(e) => setField('name', e.target.value)} />
-                <Input type="url" required placeholder="Website URL *" value={val('websiteUrl')} onChange={(e) => setField('websiteUrl', e.target.value)} />
-                <ImageUploadField label="Logo URL *" value={val('logoUrl')} onChange={(u) => setField('logoUrl', u)} purpose="sister-concern" />
-                <Input required placeholder="Description *" value={val('description')} onChange={(e) => setField('description', e.target.value)} />
-              </>
-            )}
+              {kind === 'sister-concerns' && (
+                <>
+                  <Input required placeholder="Company Name *" value={val('name')} onChange={(e) => setField('name', e.target.value)} />
+                  <Input type="url" required placeholder="Website URL *" value={val('websiteUrl')} onChange={(e) => setField('websiteUrl', e.target.value)} />
+                  <ImageUploadField label="Logo URL *" value={val('logoUrl')} onChange={(u) => setField('logoUrl', u)} purpose="sister-concern" />
+                  <Input required placeholder="Description *" value={val('description')} onChange={(e) => setField('description', e.target.value)} />
+                </>
+              )}
 
-            <div className="flex items-center justify-between pt-2">
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2 rounded-xl bg-gray-50 p-4 ring-1 ring-gray-950/5 text-sm font-medium cursor-pointer">
                 <input
                   type="checkbox"
                   checked={boolVal('isPublished', kind === 'sister-concerns')}
                   onChange={(e) => setField('isPublished', e.target.checked)}
+                  className="h-4 w-4 accent-teal-600"
                 />
-                Published
+                Published on public portal
               </label>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 border-t border-gray-950/5 bg-gray-50 px-6 py-4">
+              <Button type="button" variant="secondary" onClick={() => setSheetOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={saveMutation.isPending}>
-                {saveMutation.isPending ? 'Saving...' : 'Save Entry'}
+                {saveMutation.isPending ? 'Saving...' : 'Save changes'}
               </Button>
             </div>
           </form>
@@ -309,7 +348,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
               disabled={deleteMutation.isPending}
               onClick={() => deleteTarget && deleteMutation.mutate(String(deleteTarget.id))}
             >
-              Confirm Delete
+              Delete
             </Button>
           </div>
         </DialogContent>

@@ -42,40 +42,38 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#FAF9F6] p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
       <Helmet>
-        <title>Staff Sign In — Zero Compile</title>
+        <title>Sign in — Zero Compile Admin</title>
       </Helmet>
 
-      <div className="mb-6 flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#0D3B2E] text-white">
+      <div className="mb-6 flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600 text-white shadow-sm">
           <Compass className="h-5 w-5" />
         </span>
         <div>
-          <div className="font-display text-lg font-extrabold text-[#111827]">Zero Compile</div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#D97706]">
-            Admissions & CMS Console
-          </div>
+          <div className="text-lg font-bold tracking-tight text-gray-950">Zero Compile</div>
+          <div className="text-xs font-medium text-teal-600">Admin Panel</div>
         </div>
       </div>
 
-      <Card className="w-full max-w-sm shadow-sm">
+      <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lock className="h-4 w-4 text-[#0D3B2E]" /> Staff Sign In
+            <Lock className="h-4 w-4 text-teal-600" /> Sign in
           </CardTitle>
-          <CardDescription>Authenticate with your counselor or Super Admin credentials.</CardDescription>
+          <CardDescription>Access the Zero Compile admissions & CMS workspace.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+              <div className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 ring-1 ring-inset ring-rose-600/20">
                 {error}
               </div>
             )}
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-medium text-[#111827]">Email Address</label>
+              <label className="block text-xs font-medium text-gray-700">Email address</label>
               <Input
                 type="email"
                 required
@@ -86,7 +84,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-medium text-[#111827]">Password</label>
+              <label className="block text-xs font-medium text-gray-700">Password</label>
               <Input
                 type="password"
                 required
@@ -96,14 +94,14 @@ export default function LoginPage() {
             </div>
 
             <Button type="submit" disabled={submitting} className="w-full">
-              {submitting ? 'Signing in...' : 'Sign In to Console'}
+              {submitting ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <Link to="/" className="mt-6 text-xs text-[#6B7280] hover:text-[#111827] hover:underline">
-        ← Return to Zero Compile Public Portal
+      <Link to="/" className="mt-6 text-xs text-gray-500 hover:text-gray-900 hover:underline">
+        ← Back to public website
       </Link>
     </div>
   );

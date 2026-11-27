@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ColumnDef } from '@tanstack/react-table';
-import { Plus, Trash2 } from 'lucide-react';
+import { ChevronRight, Plus } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import type { UserRoleType } from '@zero-compile/shared';
 import { DataTable } from '../../components/admin/DataTable';
@@ -78,12 +78,12 @@ export default function UsersPage() {
       {
         accessorKey: 'name',
         header: 'Name',
-        cell: ({ row }) => <span className="font-semibold">{row.original.name}</span>,
+        cell: ({ row }) => <span className="font-semibold text-gray-950">{row.original.name}</span>,
       },
       {
         accessorKey: 'email',
         header: 'Email',
-        cell: ({ row }) => <span className="text-xs text-[#4B5563]">{row.original.email}</span>,
+        cell: ({ row }) => <span className="text-xs text-gray-600">{row.original.email}</span>,
       },
       {
         accessorKey: 'role',
@@ -96,11 +96,28 @@ export default function UsersPage() {
       },
       {
         accessorKey: 'isActive',
-        header: 'Status',
+        header: 'Active',
         cell: ({ row }) => (
-          <Badge variant={row.original.isActive ? 'success' : 'destructive'}>
-            {row.original.isActive ? 'Active' : 'Inactive'}
-          </Badge>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={row.original.isActive}
+            onClick={() =>
+              updateMutation.mutate({
+                id: row.original.id,
+                payload: { isActive: !row.original.isActive },
+              })
+            }
+            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
+              row.original.isActive ? 'bg-teal-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition ${
+                row.original.isActive ? 'translate-x-4' : 'translate-x-0'
+              }`}
+            />
+          </button>
         ),
       },
       {
@@ -108,29 +125,26 @@ export default function UsersPage() {
         header: '',
         enableSorting: false,
         cell: ({ row }) => (
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => updateMutation.mutate({ id: row.original.id, payload: { isActive: !row.original.isActive } })}
-            >
-              {row.original.isActive ? 'Deactivate' : 'Activate'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
+          <div className="flex justify-end gap-3 text-xs font-semibold">
+            <button
+              type="button"
               onClick={() =>
                 updateMutation.mutate({
                   id: row.original.id,
                   payload: { role: row.original.role === 'admin' ? 'super-admin' : 'admin' },
                 })
               }
+              className="text-teal-600 hover:text-teal-700 cursor-pointer"
             >
-              Toggle Role
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-600" onClick={() => setDeleteTarget(row.original)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
+              Toggle role
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeleteTarget(row.original)}
+              className="text-rose-600 hover:text-rose-700 cursor-pointer"
+            >
+              Delete
+            </button>
           </div>
         ),
       },
@@ -144,18 +158,22 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Helmet>
-        <title>Staff Users — Zero Compile Admin</title>
+        <title>Team & Roles — Zero Compile Admin</title>
       </Helmet>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-[#111827]">Staff & Administrator Accounts</h1>
-          <p className="text-xs text-[#6B7280]">Manage counselor access and Super Admin privileges.</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+            <span>Team & Roles</span>
+            <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+            <span className="text-gray-900">List</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-950">Team & Roles</h1>
         </div>
         <Button onClick={() => setSheetOpen(true)}>
-          <Plus className="h-4 w-4" /> New Staff User
+          <Plus className="h-4 w-4" /> New User
         </Button>
       </div>
 
