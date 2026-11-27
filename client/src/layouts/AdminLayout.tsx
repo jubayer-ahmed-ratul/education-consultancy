@@ -176,14 +176,14 @@ export default function AdminLayout() {
 
   const sidebarContent = (isCollapsed: boolean) => (
     <div className="flex h-full flex-col bg-white">
-      <div className="flex h-16 items-center justify-between border-b border-gray-950/5 px-5">
+      <div className="flex h-16 items-center justify-between border-b border-zinc-200 px-5">
         <Link to="/admin" className="flex items-center gap-2.5 overflow-hidden">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white shadow-xs">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white">
             <Compass className="h-4 w-4" />
           </span>
           {!isCollapsed && (
             <div className="flex items-center gap-2 truncate">
-              <span className="text-sm font-bold tracking-tight text-gray-950">Zero Compile</span>
+              <span className="text-sm font-bold tracking-tight text-zinc-950">Zero Compile</span>
               <span className="rounded-md bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-700 ring-1 ring-inset ring-teal-200">
                 Admin
               </span>
@@ -203,7 +203,7 @@ export default function AdminLayout() {
                   onClick={() =>
                     setCollapsedGroups((prev) => ({ ...prev, [group.title]: !prev[group.title] }))
                   }
-                  className="flex w-full items-center justify-between px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-600 cursor-pointer"
+                  className="flex w-full items-center justify-between px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-zinc-600 hover:text-zinc-950 cursor-pointer"
                 >
                   <span>{group.title}</span>
                   {isGroupCollapsed ? (
@@ -230,7 +230,7 @@ export default function AdminLayout() {
                             `group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                               isActive
                                 ? 'bg-teal-50 text-teal-700 font-semibold'
-                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-950'
+                                : 'text-zinc-950 hover:bg-zinc-100'
                             }`
                           }
                         >
@@ -239,7 +239,7 @@ export default function AdminLayout() {
                               <span className="flex items-center gap-3 min-w-0">
                                 <Icon
                                   className={`h-4 w-4 shrink-0 ${
-                                    isActive ? 'text-teal-600' : 'text-gray-400 group-hover:text-gray-600'
+                                    isActive ? 'text-teal-600' : 'text-zinc-700 group-hover:text-zinc-950'
                                   }`}
                                 />
                                 {!isCollapsed && <span className="truncate">{item.label}</span>}
@@ -262,12 +262,12 @@ export default function AdminLayout() {
         })}
       </nav>
 
-      <div className="border-t border-gray-950/5 p-3 space-y-2">
-        <div className="flex items-center gap-2.5 rounded-xl bg-gray-50 p-2.5 ring-1 ring-gray-950/5">
+      <div className="border-t border-zinc-200 p-3 space-y-2">
+        <div className="flex items-center gap-2.5 rounded-xl border border-zinc-200 bg-zinc-50 p-2.5">
           <Avatar name={user?.name || 'Admin'} className="bg-teal-600 text-white" />
           {!isCollapsed && (
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-semibold text-gray-950">{user?.name}</div>
+              <div className="truncate text-xs font-bold text-zinc-950">{user?.name}</div>
               <Badge
                 variant={user?.role === 'super-admin' ? 'success' : 'secondary'}
                 className="mt-0.5 text-[10px]"
@@ -278,7 +278,7 @@ export default function AdminLayout() {
           )}
         </div>
         <Button variant="secondary" size="sm" onClick={handleLogout} className="w-full justify-center">
-          <LogOut className="h-3.5 w-3.5 text-gray-500" />
+          <LogOut className="h-3.5 w-3.5 text-zinc-700" />
           {!isCollapsed && <span>Sign out</span>}
         </Button>
       </div>
@@ -288,10 +288,10 @@ export default function AdminLayout() {
   return (
     <TooltipProvider>
       <ScrollToTop />
-      <div className="flex min-h-screen bg-gray-50 text-gray-950">
+      <div className="flex min-h-screen bg-zinc-100/80 text-zinc-950">
         {/* Desktop Sidebar */}
         <aside
-          className={`hidden md:block shrink-0 border-r border-gray-950/5 bg-white transition-all duration-200 ${
+          className={`hidden md:block shrink-0 border-r border-zinc-200 bg-white transition-all duration-200 ${
             collapsed ? 'w-[72px]' : 'w-72'
           }`}
         >
@@ -310,7 +310,7 @@ export default function AdminLayout() {
 
         {/* Main Workspace */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-gray-950/5 bg-white px-4 sm:px-6">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-zinc-200 bg-white px-4 sm:px-6">
             <div className="flex items-center gap-2">
               <button
                 type="button"

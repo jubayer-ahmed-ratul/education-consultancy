@@ -4,22 +4,22 @@ import { cn } from '../../lib/utils';
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('rounded-xl bg-white text-gray-950 ring-1 ring-gray-950/5 shadow-sm', className)}
+      className={cn('rounded-xl border border-zinc-200 bg-white text-zinc-950', className)}
       {...props}
     />
   );
 }
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-col space-y-1 border-b border-gray-950/5 px-6 py-4', className)} {...props} />;
+  return <div className={cn('flex flex-col space-y-1 border-b border-zinc-200 px-6 py-4', className)} {...props} />;
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn('text-base font-semibold leading-6 text-gray-950', className)} {...props} />;
+  return <h3 className={cn('text-base font-bold leading-6 text-zinc-950', className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn('text-xs text-gray-500', className)} {...props} />;
+  return <p className={cn('text-xs font-medium text-zinc-600', className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

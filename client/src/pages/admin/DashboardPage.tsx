@@ -22,30 +22,13 @@ interface RecentInquiry {
   status: InquiryStatusType;
   createdAt: string;
   preferredCountry?: { name: string } | null;
-  assignedTo?: { name: string } | null;
 }
 
 interface AuditItem {
   id: string;
   action: string;
-  entityType: string;
   createdAt: string;
   performedBy?: { name: string } | null;
-}
-
-function MiniSparkline({ color = '#0D9488', points = '0,22 18,16 36,19 54,10 72,13 90,6 108,8 126,2' }: { color?: string; points?: string }) {
-  return (
-    <svg viewBox="0 0 126 26" className="mt-3 h-7 w-full overflow-visible" fill="none">
-      <polyline
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={points}
-      />
-    </svg>
-  );
 }
 
 export default function DashboardPage() {
@@ -95,7 +78,7 @@ export default function DashboardPage() {
         cell: ({ row }) => (
           <Link
             to={`/admin/inquiries/${row.original.id}`}
-            className="font-mono text-xs font-semibold text-teal-600 hover:underline"
+            className="font-mono text-xs font-bold text-teal-700 hover:underline"
           >
             {row.original.referenceNumber}
           </Link>
@@ -107,18 +90,20 @@ export default function DashboardPage() {
         accessorFn: (row) => `${row.studentFirstName} ${row.studentLastName}`,
         cell: ({ row }) => (
           <div>
-            <div className="font-medium text-gray-950">
+            <div className="font-semibold text-zinc-950">
               {row.original.studentFirstName} {row.original.studentLastName}
             </div>
-            <div className="text-xs text-gray-500">{row.original.studentEmail}</div>
+            <div className="text-xs text-zinc-600">{row.original.studentEmail}</div>
           </div>
         ),
       },
       {
         id: 'country',
-        header: 'Country',
+        header: 'Destination',
         cell: ({ row }) => (
-          <span className="text-xs text-gray-600">{row.original.preferredCountry?.name ?? '—'}</span>
+          <span className="text-xs font-medium text-zinc-950">
+            {row.original.preferredCountry?.name ?? '—'}
+          </span>
         ),
       },
       {
@@ -134,7 +119,7 @@ export default function DashboardPage() {
           <div className="text-right">
             <Link
               to={`/admin/inquiries/${row.original.id}`}
-              className="text-xs font-semibold text-teal-600 hover:text-teal-700"
+              className="text-xs font-bold text-teal-600 hover:text-teal-700"
             >
               View
             </Link>
@@ -146,9 +131,44 @@ export default function DashboardPage() {
   );
 
   const statusBreakdown = [
-    { label: 'New', count: newCount, color: 'bg-sky-500' },
+    { label: 'New', count: newCount, color: 'bg-sky-600' },
     { label: 'In Review', count: reviewCount, color: 'bg-amber-500' },
-    { label: 'Approved', count: approvedCount, color: 'bg-emerald-500' },
+    { label: 'Approved', count: approvedCount, color: 'bg-emerald-600' },
+  ];
+
+  const statsCards = [
+    {
+      label: 'Active Inquiries',
+      value: totalActive,
+      badge: 'Live queue',
+      icon: Inbox,
+      barColor: 'bg-teal-600',
+      barWidth: '78%',
+    },
+    {
+      label: 'Pending Review',
+      value: newCount + reviewCount,
+      badge: 'Needs triage',
+      icon: Clock,
+      barColor: 'bg-amber-500',
+      barWidth: '52%',
+    },
+    {
+      label: 'Approved Outcomes',
+      value: approvedCount,
+      badge: 'Verified',
+      icon: CheckCircle2,
+      barColor: 'bg-emerald-600',
+      barWidth: '64%',
+    },
+    {
+      label: 'Partner Universities',
+      value: universitiesRes?.meta?.total ?? 0,
+      badge: 'Published',
+      icon: Building2,
+      barColor: 'bg-teal-600',
+      barWidth: '88%',
+    },
   ];
 
   return (
@@ -157,93 +177,60 @@ export default function DashboardPage() {
         <title>Dashboard — Zero Compile Admin</title>
       </Helmet>
 
-      {/* Filament Header Row */}
+      {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-950">Dashboard</h1>
-          <p className="mt-0.5 text-sm text-gray-500">
-            Welcome back, <strong className="font-medium text-gray-800">{user?.name}</strong>.
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-950">Dashboard</h1>
+          <p className="mt-0.5 text-sm font-medium text-zinc-700">
+            Signed in as <span className="font-bold text-zinc-950">{user?.name}</span>
           </p>
         </div>
         <div className="flex items-center gap-2.5">
           <Link to="/" target="_blank">
             <Button variant="secondary" size="sm">
-              View Public Site <ArrowUpRight className="h-3.5 w-3.5 text-gray-400" />
+              Visit Site <ArrowUpRight className="h-3.5 w-3.5 text-zinc-700" />
             </Button>
           </Link>
-          <Link to="/admin/inquiries">
-            <Button size="sm">Open Inquiries Queue</Button>
+          <Link to="/apply" target="_blank">
+            <Button size="sm">+ New Inquiry</Button>
           </Link>
         </div>
       </div>
 
-      {/* Filament Stats Overview Widget */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl bg-white p-6 ring-1 ring-gray-950/5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Active Inquiries</span>
-            <Inbox className="h-4 w-4 text-teal-600" />
-          </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-bold tabular-nums text-gray-950">{totalActive}</span>
-            <span className="inline-flex items-center gap-0.5 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
-              <TrendingUp className="h-3 w-3" /> Live
-            </span>
-          </div>
-          <MiniSparkline color="#0D9488" />
-        </div>
-
-        <div className="rounded-xl bg-white p-6 ring-1 ring-gray-950/5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Pending Review</span>
-            <Clock className="h-4 w-4 text-teal-600" />
-          </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-bold tabular-nums text-gray-950">{newCount + reviewCount}</span>
-            <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
-              Needs triage
-            </span>
-          </div>
-          <MiniSparkline color="#F59E0B" points="0,18 18,20 36,14 54,16 72,9 90,11 108,7 126,5" />
-        </div>
-
-        <div className="rounded-xl bg-white p-6 ring-1 ring-gray-950/5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Approved Outcomes</span>
-            <CheckCircle2 className="h-4 w-4 text-teal-600" />
-          </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-bold tabular-nums text-gray-950">{approvedCount}</span>
-            <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
-              Verified
-            </span>
-          </div>
-          <MiniSparkline color="#10B981" points="0,24 18,21 36,18 54,14 72,15 90,9 108,6 126,3" />
-        </div>
-
-        <div className="rounded-xl bg-white p-6 ring-1 ring-gray-950/5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Partner Universities</span>
-            <Building2 className="h-4 w-4 text-teal-600" />
-          </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-bold tabular-nums text-gray-950">
-              {universitiesRes?.meta?.total ?? '—'}
-            </span>
-            <span className="rounded-md bg-teal-50 px-1.5 py-0.5 text-[11px] font-medium text-teal-700 ring-1 ring-inset ring-teal-200">
-              Published
-            </span>
-          </div>
-          <MiniSparkline color="#0D9488" points="0,20 18,18 36,18 54,15 72,12 90,10 108,8 126,6" />
-        </div>
+      {/* 4 High-Contrast Stat Cards */}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {statsCards.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div key={stat.label} className="rounded-xl border border-zinc-200 bg-white p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-950">
+                  {stat.label}
+                </span>
+                <Icon className="h-4 w-4 text-teal-600" />
+              </div>
+              <div className="mt-3 flex items-baseline justify-between">
+                <span className="text-3xl font-extrabold tabular-nums text-zinc-950">
+                  {stat.value}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-md bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-700">
+                  <TrendingUp className="h-3 w-3" /> {stat.badge}
+                </span>
+              </div>
+              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+                <div className={`h-full rounded-full ${stat.barColor}`} style={{ width: stat.barWidth }} />
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* 2-Column Widget Grid */}
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <div className="lg:col-span-8 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-950">Latest Inquiries</h2>
-            <Link to="/admin/inquiries" className="text-xs font-semibold text-teal-600 hover:text-teal-700">
+            <h2 className="text-base font-bold text-zinc-950">Recent Inquiries</h2>
+            <Link to="/admin/inquiries" className="text-xs font-bold text-teal-600 hover:text-teal-700">
               View all →
             </Link>
           </div>
@@ -266,12 +253,12 @@ export default function DashboardPage() {
                 return (
                   <div key={item.label} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-gray-700">{item.label}</span>
-                      <span className="font-mono font-semibold tabular-nums text-gray-950">
+                      <span className="font-semibold text-zinc-950">{item.label}</span>
+                      <span className="font-mono font-bold tabular-nums text-zinc-950">
                         {item.count} ({pct}%)
                       </span>
                     </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
                       <div className={`h-full rounded-full ${item.color}`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
@@ -283,24 +270,27 @@ export default function DashboardPage() {
           {can('activity-log:view') && (
             <Card>
               <CardHeader className="flex-row items-center justify-between space-y-0">
-                <CardTitle>Recent Activity</CardTitle>
-                <Link to="/admin/activity-logs" className="text-xs font-semibold text-teal-600 hover:underline">
+                <CardTitle>Latest Activity</CardTitle>
+                <Link to="/admin/activity-logs" className="text-xs font-bold text-teal-600 hover:underline">
                   All logs
                 </Link>
               </CardHeader>
               <CardContent className="space-y-3">
                 {!logsRes?.data?.length ? (
-                  <p className="text-xs text-gray-500">No recent activity.</p>
+                  <p className="text-xs font-medium text-zinc-600">No recent activity.</p>
                 ) : (
                   logsRes.data.map((log) => (
-                    <div key={log.id} className="flex items-start justify-between gap-2 border-b border-gray-950/5 pb-2.5 last:border-0 last:pb-0">
+                    <div
+                      key={log.id}
+                      className="flex items-start justify-between gap-2 border-b border-zinc-200 pb-2.5 last:border-0 last:pb-0"
+                    >
                       <div>
-                        <div className="font-mono text-xs font-semibold text-teal-700">{log.action}</div>
-                        <div className="text-[11px] text-gray-500">
+                        <div className="font-mono text-xs font-bold text-zinc-950">{log.action}</div>
+                        <div className="text-xs font-medium text-zinc-700">
                           {log.performedBy?.name ?? 'Public / System'}
                         </div>
                       </div>
-                      <span className="font-mono text-[10px] text-gray-400">
+                      <span className="font-mono text-[11px] font-medium text-zinc-600">
                         {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
