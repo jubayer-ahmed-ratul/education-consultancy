@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { AnimatedNumber } from '../../components/AnimatedNumber';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { usePublicBundle } from '../../hooks/usePublicBundle';
@@ -218,7 +219,7 @@ export default function HomePage() {
               {statsList.map((stat) => (
                 <div key={stat.order} className="text-center">
                   <div className="font-display text-3xl font-extrabold tabular-nums text-zinc-950 sm:text-4xl">
-                    {stat.value}
+                    <AnimatedNumber value={stat.value} />
                     <span className="text-teal-600">{stat.suffix}</span>
                   </div>
                   <div className="mt-1 text-xs font-medium text-zinc-700">{stat.label}</div>
