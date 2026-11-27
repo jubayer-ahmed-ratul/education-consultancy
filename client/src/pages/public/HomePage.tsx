@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion } from 'framer-motion';
@@ -21,11 +21,12 @@ import { Helmet } from 'react-helmet-async';
 import { AboutPreviewSection } from '../../components/AboutPreviewSection';
 import { AnimatedNumber } from '../../components/AnimatedNumber';
 import { ServicesSection } from '../../components/ServicesSection';
+import { UniversitiesMarqueeSection } from '../../components/UniversitiesMarqueeSection';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { usePublicBundle } from '../../hooks/usePublicBundle';
 import { apiRequest } from '../../lib/api-client';
-import { prefetchBlog, prefetchCountriesList, prefetchDestination, prefetchEvent, prefetchUniversity } from '../../lib/prefetch';
+import { prefetchBlog, prefetchCountriesList, prefetchDestination, prefetchEvent } from '../../lib/prefetch';
 import { queryKeys } from '../../lib/query-keys';
 
 const FALLBACK_DESTINATION_IMAGES = [
@@ -66,7 +67,6 @@ export default function HomePage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: bundle, isLoading } = usePublicBundle();
-  const [selectedUniCountry, setSelectedUniCountry] = useState<string>('all');
   const [heroSearch, setHeroSearch] = useState('');
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', loop: false });
@@ -82,19 +82,20 @@ export default function HomePage() {
   });
 
   const { data: universitiesRes } = useQuery({
-    queryKey: queryKeys.universities.publicList({ page: 1, limit: 9 }),
+    queryKey: queryKeys.universities.publicList({ page: 1, limit: 24 }),
     queryFn: () =>
       apiRequest<
         Array<{
           id: string;
           name: string;
           slug: string;
+          logoUrl?: string | null;
           city: string | null;
           description: string;
           programs?: string[];
           country?: { name: string; slug?: string };
         }>
-      >('/universities?page=1&limit=9'),
+      >('/universities?page=1&limit=24'),
   });
 
   const { data: blogsRes } = useQuery({
@@ -116,20 +117,6 @@ export default function HomePage() {
   const hero = bundle?.heroContent;
   const about = bundle?.siteContent;
   const stories = bundle?.successStories ?? [];
-
-  const uniCountries = useMemo(() => {
-    const names = new Set<string>();
-    universitiesRes?.data.forEach((u) => {
-      if (u.country?.name) names.add(u.country.name);
-    });
-    return Array.from(names);
-  }, [universitiesRes?.data]);
-
-  const filteredUniversities = useMemo(() => {
-    const list = universitiesRes?.data ?? [];
-    if (selectedUniCountry === 'all') return list.slice(0, 6);
-    return list.filter((u) => u.country?.name === selectedUniCountry).slice(0, 6);
-  }, [universitiesRes?.data, selectedUniCountry]);
 
   function handleHeroSearch(e: FormEvent) {
     e.preventDefault();
@@ -306,86 +293,8 @@ export default function HomePage() {
       {/* 8 Core Study Abroad Services */}
       <ServicesSection />
 
-      {/* Featured Universities (Filterable Grid) */}
-      <section className="mx-auto max-w-11/12 space-y-6 px-4 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
-              <GraduationCap className="h-3.5 w-3.5" /> Accredited Institutions
-            </div>
-            <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">
-              Featured Universities
-            </h2>
-          </div>
-          <Link
-            to="/universities"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700 hover:text-teal-800"
-          >
-            View Full Directory <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        {uniCountries.length > 1 && (
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setSelectedUniCountry('all')}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
-                selectedUniCountry === 'all'
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-white text-zinc-700 ring-1 ring-zinc-950/10 hover:text-zinc-950'
-              }`}
-            >
-              All Countries
-            </button>
-            {uniCountries.map((countryName) => (
-              <button
-                key={countryName}
-                type="button"
-                onClick={() => setSelectedUniCountry(countryName)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
-                  selectedUniCountry === countryName
-                    ? 'bg-teal-600 text-white'
-                    : 'bg-white text-zinc-700 ring-1 ring-zinc-950/10 hover:text-zinc-950'
-                }`}
-              >
-                {countryName}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredUniversities.map((u) => (
-            <Link
-              key={u.id}
-              to={`/universities/${u.slug}`}
-              onMouseEnter={() => void prefetchUniversity(queryClient, u.slug)}
-              onTouchStart={() => void prefetchUniversity(queryClient, u.slug)}
-              onFocus={() => void prefetchUniversity(queryClient, u.slug)}
-              className="group flex flex-col justify-between space-y-3 rounded-xl bg-white p-5 ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40 hover:shadow-sm"
-            >
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-teal-700">
-                  {[u.city, u.country?.name].filter(Boolean).join(', ')}
-                </div>
-                <h3 className="font-display text-base font-bold text-zinc-950 group-hover:text-teal-700">
-                  {u.name}
-                </h3>
-                <p className="text-xs leading-relaxed text-zinc-700 line-clamp-2">{u.description}</p>
-              </div>
-              <div className="flex items-center justify-between border-t border-zinc-200 pt-3 text-xs">
-                <span className="font-medium text-zinc-600">
-                  {u.programs?.length ? `${u.programs.length} Programs` : 'View Details'}
-                </span>
-                <span className="inline-flex items-center gap-1 font-semibold text-teal-700">
-                  Explore <ArrowRight className="h-3.5 w-3.5" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Dual-Row Infinite Partner Universities Marquee */}
+      <UniversitiesMarqueeSection universities={universitiesRes?.data ?? []} />
 
       {/* How It Works — 4-Step Admission Process */}
       <section className="border-y border-zinc-200 bg-white py-16">
