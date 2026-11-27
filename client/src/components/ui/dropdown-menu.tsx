@@ -15,12 +15,51 @@ export function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         sideOffset={sideOffset}
         className={cn(
-          'z-50 min-w-[180px] overflow-hidden rounded-md border border-[#E5E2DC] bg-white p-1 text-[#111827] shadow-md',
+          'z-50 min-w-[180px] overflow-hidden rounded-xl border border-zinc-200 bg-white p-1 text-zinc-950 shadow-md',
           className
         )}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
+  );
+}
+
+export function DropdownMenuItem({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item>) {
+  return (
+    <DropdownMenuPrimitive.Item
+      className={cn(
+        'relative flex cursor-pointer select-none items-center rounded-lg px-2.5 py-2 text-xs font-medium text-zinc-950 outline-none hover:bg-zinc-100 focus:bg-zinc-100',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export function DropdownMenuLabel({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label>) {
+  return (
+    <DropdownMenuPrimitive.Label
+      className={cn('px-2.5 py-1.5 text-xs font-semibold text-zinc-950', className)}
+      {...props}
+    />
+  );
+}
+
+export function DropdownMenuSeparator({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>) {
+  return (
+    <DropdownMenuPrimitive.Separator
+      className={cn('-mx-1 my-1 h-px bg-zinc-200', className)}
+      {...props}
+    />
   );
 }
 

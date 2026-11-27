@@ -4,6 +4,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   Activity,
   Award,
+  Bell,
   BookOpen,
   Building2,
   Calendar,
@@ -27,9 +28,15 @@ import {
 import type { PermissionKey } from '@zero-compile/shared';
 import { ScrollToTop } from '../components/ScrollToTop';
 import { Avatar } from '../components/ui/avatar';
-import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu';
 import { Input } from '../components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
@@ -175,16 +182,16 @@ export default function AdminLayout() {
   const newInquiryCount = inquiryCountRes?.meta?.total ?? 0;
 
   const sidebarContent = (isCollapsed: boolean) => (
-    <div className="flex h-full flex-col bg-white">
-      <div className="flex h-16 items-center justify-between border-b border-zinc-200 px-5">
+    <div className="flex h-full flex-col bg-gradient-to-b from-[#0B1120] via-[#132238] to-[#0D9488] text-white">
+      <div className="flex h-16 items-center justify-between border-b border-white/10 px-5">
         <Link to="/admin" className="flex items-center gap-2.5 overflow-hidden">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-zinc-950 shadow-xs">
             <Compass className="h-4 w-4" />
           </span>
           {!isCollapsed && (
             <div className="flex items-center gap-2 truncate">
-              <span className="text-sm font-bold tracking-tight text-black">Zero Compile</span>
-              <span className="rounded-md bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-700 ring-1 ring-inset ring-teal-200">
+              <span className="text-sm font-bold tracking-tight text-white">Zero Compile</span>
+              <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-semibold text-white">
                 Admin
               </span>
             </div>
@@ -203,7 +210,7 @@ export default function AdminLayout() {
                   onClick={() =>
                     setCollapsedGroups((prev) => ({ ...prev, [group.title]: !prev[group.title] }))
                   }
-                  className="flex w-full items-center justify-between px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-black hover:text-black cursor-pointer"
+                  className="flex w-full items-center justify-between px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white/60 hover:text-white cursor-pointer"
                 >
                   <span>{group.title}</span>
                   {isGroupCollapsed ? (
@@ -227,10 +234,10 @@ export default function AdminLayout() {
                           onFocus={() => void prefetchAdminRoute(queryClient, item.to)}
                           onClick={() => setMobileOpen(false)}
                           className={({ isActive }) =>
-                            `group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                            `group flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-all ${
                               isActive
-                                ? 'bg-teal-50 text-teal-700 font-semibold'
-                                : 'text-black hover:bg-zinc-100'
+                                ? 'bg-white text-zinc-950 font-semibold shadow-sm'
+                                : 'text-white/80 font-medium hover:bg-white/10 hover:text-white'
                             }`
                           }
                         >
@@ -239,13 +246,19 @@ export default function AdminLayout() {
                               <span className="flex items-center gap-3 min-w-0">
                                 <Icon
                                   className={`h-4 w-4 shrink-0 ${
-                                    isActive ? 'text-teal-600' : 'text-black'
+                                    isActive ? 'text-zinc-950' : 'text-white/75 group-hover:text-white'
                                   }`}
                                 />
                                 {!isCollapsed && <span className="truncate">{item.label}</span>}
                               </span>
                               {!isCollapsed && item.badgeKey === 'inquiries' && newInquiryCount > 0 && (
-                                <span className="rounded-md bg-teal-50 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-teal-700 ring-1 ring-inset ring-teal-200">
+                                <span
+                                  className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
+                                    isActive
+                                      ? 'bg-teal-600 text-white'
+                                      : 'bg-white/20 text-white'
+                                  }`}
+                                >
                                   {newInquiryCount}
                                 </span>
                               )}
@@ -262,25 +275,27 @@ export default function AdminLayout() {
         })}
       </nav>
 
-      <div className="border-t border-zinc-200 p-3 space-y-2">
-        <div className="flex items-center gap-2.5 rounded-xl border border-zinc-200 bg-zinc-50 p-2.5">
-          <Avatar name={user?.name || 'Admin'} className="bg-teal-600 text-white" />
+      {/* Bottom User Profile Card */}
+      <div className="border-t border-white/15 p-3 space-y-2">
+        <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 p-2.5 backdrop-blur-xs">
+          <Avatar name={user?.name || 'Admin'} className="bg-white text-zinc-950 font-bold" />
           {!isCollapsed && (
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-bold text-black">{user?.name}</div>
-              <Badge
-                variant={user?.role === 'super-admin' ? 'success' : 'secondary'}
-                className="mt-0.5 text-[10px]"
-              >
+              <div className="truncate text-xs font-bold text-white">{user?.name}</div>
+              <span className="mt-0.5 inline-block rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/90">
                 {user?.role}
-              </Badge>
+              </span>
             </div>
           )}
         </div>
-        <Button variant="secondary" size="sm" onClick={handleLogout} className="w-full justify-center text-black">
-          <LogOut className="h-3.5 w-3.5 text-black" />
-          {!isCollapsed && <span>Sign out</span>}
-        </Button>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-white/20 cursor-pointer"
+        >
+          <LogOut className="h-3.5 w-3.5 text-white" />
+          {!isCollapsed && <span>Sign Out</span>}
+        </button>
       </div>
     </div>
   );
@@ -288,11 +303,11 @@ export default function AdminLayout() {
   return (
     <TooltipProvider>
       <ScrollToTop />
-      <div className="flex min-h-screen bg-zinc-100/80 text-zinc-950">
-        {/* Desktop Sidebar */}
+      <div className="flex min-h-screen bg-[#F4F6FA] text-zinc-950">
+        {/* Desktop Floating Gradient Sidebar */}
         <aside
-          className={`hidden md:block shrink-0 border-r border-zinc-200 bg-white transition-all duration-200 ${
-            collapsed ? 'w-[72px]' : 'w-72'
+          className={`hidden md:block shrink-0 my-3 ml-3 overflow-hidden rounded-2xl shadow-sm transition-all duration-200 ${
+            collapsed ? 'w-[72px]' : 'w-64'
           }`}
         >
           {sidebarContent(collapsed)}
@@ -300,7 +315,7 @@ export default function AdminLayout() {
 
         {/* Mobile Sheet Drawer */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetContent side="left" className="p-0">
+          <SheetContent side="left" className="w-72 border-0 p-0">
             <SheetHeader className="sr-only">
               <SheetTitle>Admin Navigation</SheetTitle>
             </SheetHeader>
@@ -310,12 +325,12 @@ export default function AdminLayout() {
 
         {/* Main Workspace */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-zinc-200 bg-white px-4 sm:px-6">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-zinc-200/80 bg-[#F4F6FA]/90 px-4 backdrop-blur-md sm:px-6 lg:px-8">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 md:hidden"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white text-zinc-950 ring-1 ring-zinc-200/80 hover:bg-zinc-50 md:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
@@ -323,35 +338,70 @@ export default function AdminLayout() {
               <button
                 type="button"
                 onClick={() => setCollapsed((c) => !c)}
-                className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white text-zinc-950 ring-1 ring-zinc-200/80 hover:bg-zinc-50 cursor-pointer"
                 aria-label="Toggle sidebar"
               >
                 {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
               </button>
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* Filament Global Search Trigger */}
+            <div className="flex items-center gap-2.5">
+              {/* Pill Search Trigger */}
               <button
                 type="button"
                 onClick={() => setCmdOpen(true)}
-                className="flex h-9 w-48 sm:w-72 items-center justify-between rounded-lg bg-gray-50 px-3 text-xs text-gray-500 ring-1 ring-inset ring-gray-300 hover:bg-white cursor-pointer"
+                className="flex h-9 w-48 sm:w-72 items-center justify-between rounded-full bg-white px-3.5 text-xs text-zinc-600 ring-1 ring-zinc-200/80 transition-colors hover:ring-zinc-300 cursor-pointer"
               >
                 <span className="flex items-center gap-2">
-                  <Search className="h-3.5 w-3.5 text-gray-400" />
-                  <span>Search...</span>
+                  <Search className="h-3.5 w-3.5 text-zinc-950" />
+                  <span>Search anything...</span>
                 </span>
-                <kbd className="rounded bg-white px-1.5 py-0.5 font-mono text-[10px] font-medium text-gray-400 ring-1 ring-gray-200">
+                <kbd className="rounded-full bg-zinc-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-700">
                   ⌘K
                 </kbd>
               </button>
 
-              <Link to="/" target="_blank">
-                <Button variant="secondary" size="sm">
-                  <span>Visit Site</span>
-                  <ExternalLink className="h-3.5 w-3.5 text-gray-400" />
-                </Button>
+              {/* Notification Bell */}
+              <Link
+                to="/admin/inquiries"
+                aria-label="View new inquiries"
+                className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-zinc-950 ring-1 ring-zinc-200/80 hover:bg-zinc-50"
+              >
+                <Bell className="h-4 w-4" />
+                {newInquiryCount > 0 && (
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-teal-600 ring-2 ring-white" />
+                )}
               </Link>
+
+              {/* User Avatar Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 rounded-full bg-white p-1 pr-2.5 ring-1 ring-zinc-200/80 hover:bg-zinc-50 cursor-pointer"
+                  >
+                    <Avatar name={user?.name || 'Admin'} className="h-7 w-7 bg-teal-600 text-white text-xs" />
+                    <ChevronDown className="h-3.5 w-3.5 text-zinc-700" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuLabel className="text-zinc-950">
+                    <div className="font-bold">{user?.name}</div>
+                    <div className="text-xs font-normal text-zinc-600">{user?.email}</div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/" target="_blank" className="flex items-center justify-between cursor-pointer">
+                      <span>Visit Live Site</span>
+                      <ExternalLink className="h-3.5 w-3.5 text-zinc-600" />
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-zinc-950 cursor-pointer">
+                    <LogOut className="mr-2 h-3.5 w-3.5" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
@@ -360,11 +410,11 @@ export default function AdminLayout() {
           </main>
         </div>
 
-        {/* Filament Global Search Modal */}
+        {/* Global Search Modal */}
         <Dialog open={cmdOpen} onOpenChange={setCmdOpen}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Global Search</DialogTitle>
+              <DialogTitle className="text-zinc-950">Global Search</DialogTitle>
             </DialogHeader>
             <Input
               autoFocus
@@ -375,7 +425,7 @@ export default function AdminLayout() {
             <div className="mt-3 max-h-80 space-y-3 overflow-y-auto text-sm">
               {searchInquiries?.data && searchInquiries.data.length > 0 && (
                 <div>
-                  <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                     Inquiries
                   </div>
                   {searchInquiries.data.map((inq) => (
@@ -387,12 +437,12 @@ export default function AdminLayout() {
                         setCmdOpen(false);
                         setCmdQuery('');
                       }}
-                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
+                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-zinc-950 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
                     >
                       <span className="font-medium">
                         {inq.studentFirstName} {inq.studentLastName}
                       </span>
-                      <span className="font-mono text-xs text-teal-600">{inq.referenceNumber}</span>
+                      <span className="font-mono text-xs font-semibold text-teal-700">{inq.referenceNumber}</span>
                     </button>
                   ))}
                 </div>
@@ -400,7 +450,7 @@ export default function AdminLayout() {
 
               {searchCountries?.data && searchCountries.data.length > 0 && (
                 <div>
-                  <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                     Countries
                   </div>
                   {searchCountries.data.map((c) => (
@@ -412,7 +462,7 @@ export default function AdminLayout() {
                         setCmdOpen(false);
                         setCmdQuery('');
                       }}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-zinc-950 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
                     >
                       <Globe2 className="h-3.5 w-3.5 text-teal-600" />
                       <span>{c.name}</span>
@@ -423,7 +473,7 @@ export default function AdminLayout() {
 
               {searchUniversities?.data && searchUniversities.data.length > 0 && (
                 <div>
-                  <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                     Universities
                   </div>
                   {searchUniversities.data.map((u) => (
@@ -435,7 +485,7 @@ export default function AdminLayout() {
                         setCmdOpen(false);
                         setCmdQuery('');
                       }}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-zinc-950 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
                     >
                       <Building2 className="h-3.5 w-3.5 text-teal-600" />
                       <span>{u.name}</span>
@@ -445,7 +495,7 @@ export default function AdminLayout() {
               )}
 
               <div>
-                <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                <div className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                   Navigation
                 </div>
                 {filteredNavItems.map((item) => {
@@ -459,7 +509,7 @@ export default function AdminLayout() {
                         setCmdOpen(false);
                         setCmdQuery('');
                       }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-zinc-950 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
                     >
                       <Icon className="h-4 w-4 text-teal-600" />
                       <span>{item.label}</span>
