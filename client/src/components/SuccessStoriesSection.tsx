@@ -14,6 +14,13 @@ const FALLBACK_IMAGES = [
   '/about-campus.jpg',
 ];
 
+function getCircularOffset(index: number, activeIndex: number, total: number): number {
+  let offset = index - activeIndex;
+  if (offset > total / 2) offset -= total;
+  if (offset < -total / 2) offset += total;
+  return offset;
+}
+
 export function SuccessStoriesSection({ stories }: { stories: StoryItem[] }) {
   const items = stories.slice(0, 6);
   const total = items.length;
@@ -31,61 +38,26 @@ export function SuccessStoriesSection({ stories }: { stories: StoryItem[] }) {
 
   if (!total) return null;
 
-  const prevIndex = (activeIndex - 1 + total) % total;
-  const nextIndex = (activeIndex + 1) % total;
-
   const goPrev = () => setActiveIndex((prev) => (prev - 1 + total) % total);
   const goNext = () => setActiveIndex((prev) => (prev + 1) % total);
 
-  function renderCard(
-    story: StoryItem | undefined,
-    idx: number,
-    position: 'left' | 'center' | 'right'
-  ) {
-    if (!story) return null;
-    const isCenter = position === 'center';
-    const imgSrc = story.studentImage || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
-    const badgeText = `${story.country}${story.achievement ? ` • ${story.achievement}` : ' • Visa Approved'}`;
-
-    return (
-      <div
-        key={`${story.id}-${position}`}
-        onClick={() => {
-          if (position === 'left') goPrev();
-          if (position === 'right') goNext();
-        }}
-        className={`relative aspect-[3/4] shrink-0 overflow-hidden rounded-2xl bg-zinc-900 transition-all duration-500 ${
-          isCenter
-            ? 'z-20 w-[280px] scale-100 opacity-100 shadow-xl ring-2 ring-teal-600/40 sm:w-[320px] md:w-[350px]'
-            : 'z-10 hidden w-[240px] scale-90 cursor-pointer opacity-70 ring-1 ring-zinc-950/10 hover:opacity-90 sm:block md:w-[270px]'
-        }`}
-      >
-        <img
-          src={imgSrc}
-          alt={story.name}
-          loading="lazy"
-          className="h-full w-full object-cover object-top"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent" />
-
-        <div className="absolute inset-x-0 bottom-0 space-y-2 p-5">
-          <span className="inline-block rounded-full bg-teal-600 px-2.5 py-0.5 text-xs font-semibold text-white">
-            {badgeText}
-          </span>
-          <h3 className="font-display text-xl font-bold tracking-tight text-white">
-            {story.name}
-          </h3>
-          <p className="text-xs font-medium text-white/85">
-            {story.program} — {story.university}
-          </p>
-          {isCenter && (
-            <p className="pt-1 text-xs leading-relaxed text-white/80 line-clamp-2">
-              “{story.testimonial}”
-            </p>
-          )}
-        </div>
-      </div>
-    );
+  function getPositionClasses(offset: number): string {
+    if (offset === 0) {
+      return 'translate-x-0 scale-100 opacity-100 z-30 shadow-2xl ring-2 ring-teal-500/40';
+    }
+    if (offset === -1) {
+      return '-translate-x-[68%] scale-[0.86] opacity-85 z-20 cursor-pointer hover:opacity-95 ring-1 ring-zinc-950/10 shadow-lg';
+    }
+    if (offset === 1) {
+      return 'translate-x-[68%] scale-[0.86] opacity-85 z-20 cursor-pointer hover:opacity-95 ring-1 ring-zinc-950/10 shadow-lg';
+    }
+    if (offset === -2) {
+      return 'hidden sm:block -translate-x-[122%] scale-[0.74] opacity-55 z-10 cursor-pointer hover:opacity-75 ring-1 ring-zinc-950/10 shadow-md';
+    }
+    if (offset === 2) {
+      return 'hidden sm:block translate-x-[122%] scale-[0.74] opacity-55 z-10 cursor-pointer hover:opacity-75 ring-1 ring-zinc-950/10 shadow-md';
+    }
+    return 'translate-x-0 scale-50 opacity-0 pointer-events-none z-0';
   }
 
   return (
@@ -109,7 +81,7 @@ export function SuccessStoriesSection({ stories }: { stories: StoryItem[] }) {
         </Link>
       </div>
 
-      {/* Center-Focus Peek Carousel */}
+      {/* Layered Overlapping Coverflow Stage */}
       <div
         className="relative overflow-hidden py-4"
         onMouseEnter={() => setPaused(true)}
@@ -136,7 +108,7 @@ export function SuccessStoriesSection({ stories }: { stories: StoryItem[] }) {
               type="button"
               onClick={goPrev}
               aria-label="Previous success story"
-              className="absolute left-2 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-zinc-950 shadow-md ring-1 ring-zinc-950/10 transition-colors hover:bg-teal-600 hover:text-white cursor-pointer sm:left-4"
+              className="absolute left-2 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-zinc-950 shadow-md ring-1 ring-zinc-950/10 transition-colors hover:bg-teal-600 hover:text-white cursor-pointer sm:left-4"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -144,23 +116,63 @@ export function SuccessStoriesSection({ stories }: { stories: StoryItem[] }) {
               type="button"
               onClick={goNext}
               aria-label="Next success story"
-              className="absolute right-2 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-zinc-950 shadow-md ring-1 ring-zinc-950/10 transition-colors hover:bg-teal-600 hover:text-white cursor-pointer sm:right-4"
+              className="absolute right-2 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-zinc-950 shadow-md ring-1 ring-zinc-950/10 transition-colors hover:bg-teal-600 hover:text-white cursor-pointer sm:right-4"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
           </>
         )}
 
-        {/* 3-Card Stage (Left Peek | Center Focus | Right Peek) */}
-        <div className="flex items-center justify-center gap-4 sm:gap-6">
-          {total > 2 && renderCard(items[prevIndex], prevIndex, 'left')}
-          {renderCard(items[activeIndex], activeIndex, 'center')}
-          {total > 1 && renderCard(items[nextIndex], nextIndex, 'right')}
+        {/* Overlapping Coverflow Cards */}
+        <div className="relative flex h-[390px] w-full items-center justify-center sm:h-[440px] md:h-[480px]">
+          {items.map((story, idx) => {
+            const offset = getCircularOffset(idx, activeIndex, total);
+            const imgSrc = story.studentImage || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
+
+            return (
+              <div
+                key={story.id}
+                onClick={() => {
+                  if (offset !== 0) setActiveIndex(idx);
+                }}
+                className={`absolute aspect-[3/4] w-[270px] overflow-hidden rounded-2xl bg-zinc-900 transition-all duration-500 ease-out sm:w-[310px] md:w-[340px] ${getPositionClasses(
+                  offset
+                )}`}
+              >
+                <img
+                  src={imgSrc}
+                  alt={story.name}
+                  loading="lazy"
+                  className="h-full w-full object-cover object-top"
+                />
+
+                {/* Top-Right Verified Pill */}
+                <span className="absolute right-3 top-3 rounded-full border border-white/15 bg-zinc-900/75 px-2.5 py-0.5 text-[11px] font-medium text-white backdrop-blur-xs">
+                  Verified
+                </span>
+
+                {/* Bottom Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />
+
+                <div className="absolute inset-x-0 bottom-0 space-y-1 p-5">
+                  <h3 className="font-display text-lg font-extrabold uppercase tracking-wide text-white sm:text-xl">
+                    {story.name}
+                  </h3>
+                  <div className="text-xs font-medium text-teal-300 sm:text-sm">
+                    {story.university} • {story.country}
+                  </div>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-white/85 sm:text-xs">
+                    {story.program}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Bottom Pill Indicators */}
         {total > 1 && (
-          <div className="mt-6 flex items-center justify-center gap-2">
+          <div className="mt-5 flex items-center justify-center gap-2">
             {items.map((s, idx) => (
               <button
                 key={s.id}
