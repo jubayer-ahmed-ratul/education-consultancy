@@ -92,9 +92,13 @@ export function prefetchContactPage(queryClient: QueryClient) {
 
 export function prefetchRoute(queryClient: QueryClient, to: string) {
   const task = (() => {
-    if (to === '/destinations') return prefetchCountriesList(queryClient);
+    if (to === '/destinations' || to === '/countries') return prefetchCountriesList(queryClient);
     if (to.startsWith('/destinations/')) {
       const slug = to.slice('/destinations/'.length);
+      if (slug) return prefetchDestination(queryClient, slug);
+    }
+    if (to.startsWith('/countries/')) {
+      const slug = to.slice('/countries/'.length);
       if (slug) return prefetchDestination(queryClient, slug);
     }
     if (to === '/universities') return prefetchUniversitiesList(queryClient);

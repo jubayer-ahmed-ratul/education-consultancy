@@ -46,6 +46,8 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'destinations', element: <DestinationsPage /> },
       { path: 'destinations/:slug', element: <DestinationDetailPage /> },
+      { path: 'countries', element: <DestinationsPage /> },
+      { path: 'countries/:slug', element: <DestinationDetailPage /> },
       { path: 'universities', element: <UniversitiesPage /> },
       { path: 'universities/:slug', element: <UniversityDetailPage /> },
       { path: 'blogs', element: <BlogsPage /> },

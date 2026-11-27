@@ -24,8 +24,15 @@ import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { usePublicBundle } from '../../hooks/usePublicBundle';
 import { apiRequest } from '../../lib/api-client';
-import { prefetchBlog, prefetchDestination, prefetchEvent, prefetchUniversity } from '../../lib/prefetch';
+import { prefetchBlog, prefetchCountriesList, prefetchDestination, prefetchEvent, prefetchUniversity } from '../../lib/prefetch';
 import { queryKeys } from '../../lib/query-keys';
+
+const FALLBACK_DESTINATION_IMAGES = [
+  '/hero-landmarks.jpg',
+  '/about-primary.jpg',
+  '/about-campus.jpg',
+  '/about-counseling.jpg',
+];
 
 const ADMISSION_STEPS = [
   {
@@ -231,72 +238,69 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Top Study Destinations */}
-      <section className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
-              <Globe2 className="h-3.5 w-3.5" /> Global Pathways
-            </div>
-            <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">
-              Top Study Destinations
-            </h2>
-          </div>
-          <Link
-            to="/destinations"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700 hover:text-teal-800"
-          >
-            Explore All Destinations <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {countriesRes?.data.map((c) => (
-            <Link
-              key={c.id}
-              to={`/destinations/${c.slug}`}
-              onMouseEnter={() => void prefetchDestination(queryClient, c.slug)}
-              onTouchStart={() => void prefetchDestination(queryClient, c.slug)}
-              onFocus={() => void prefetchDestination(queryClient, c.slug)}
-              className="group flex flex-col overflow-hidden rounded-xl bg-white ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40 hover:shadow-sm"
-            >
-              {c.imageUrl && (
-                <div className="aspect-[16/10] w-full overflow-hidden bg-zinc-100">
-                  <img
-                    src={c.imageUrl}
-                    alt={c.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  />
-                </div>
-              )}
-              <div className="flex flex-1 flex-col justify-between space-y-4 p-5">
-                <div>
-                  <h3 className="font-display text-lg font-bold text-zinc-950 group-hover:text-teal-700">
-                    {c.name}
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-zinc-700 line-clamp-2">{c.description}</p>
-                </div>
-                <div className="flex items-center justify-between border-t border-zinc-200 pt-3 text-xs">
-                  <span className="font-medium text-zinc-600">
-                    {c.intakes.length > 0 ? `Intakes: ${c.intakes.slice(0, 2).join(' • ')}` : 'Multiple intakes'}
-                  </span>
-                  <span className="inline-flex items-center gap-1 font-semibold text-teal-700">
-                    Guide <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* About Us 2-Column Asymmetric Section */}
       <AboutPreviewSection
         siteContent={about}
         galleryItems={bundle?.galleryItems}
         heroStats={bundle?.heroStats}
       />
+
+      {/* Top Destinations — 4 Full-Bleed Image Cards */}
+      <section className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
+              <Globe2 className="h-3.5 w-3.5" /> Global Pathways
+            </div>
+            <h2 className="mt-1 font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">
+              Top Destinations
+            </h2>
+          </div>
+          <Link
+            to="/countries"
+            onMouseEnter={() => void prefetchCountriesList(queryClient)}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600 transition-colors hover:text-teal-700"
+          >
+            View All Destinations <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {countriesRes?.data.slice(0, 4).map((c, idx) => (
+            <Link
+              key={c.id}
+              to={`/countries/${c.slug}`}
+              onMouseEnter={() => void prefetchDestination(queryClient, c.slug)}
+              onTouchStart={() => void prefetchDestination(queryClient, c.slug)}
+              onFocus={() => void prefetchDestination(queryClient, c.slug)}
+              className="group relative aspect-[3/4] cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-zinc-950/10"
+            >
+              <img
+                src={c.imageUrl || FALLBACK_DESTINATION_IMAGES[idx % FALLBACK_DESTINATION_IMAGES.length]}
+                alt={c.name}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5">
+                <div className="space-y-1.5">
+                  {c.intakes.length > 0 && (
+                    <span className="inline-block rounded-full bg-teal-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                      {c.intakes[0]}
+                    </span>
+                  )}
+                  <h3 className="font-display text-2xl font-bold tracking-tight text-white">
+                    {c.name}
+                  </h3>
+                </div>
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-xs transition-all group-hover:bg-teal-600">
+                  Explore <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* Featured Universities (Filterable Grid) */}
       <section className="mx-auto max-w-11/12 space-y-6 px-4 sm:px-6">
