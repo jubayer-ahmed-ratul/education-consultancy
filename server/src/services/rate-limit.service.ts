@@ -30,27 +30,28 @@ export const rateLimitService = {
     }
 
     try {
-      const record = await prisma.$transaction(async (tx) => {
-        const existing = await tx.rateLimit.findUnique({ where: { id: key } });
+      const rows = await prisma.$queryRaw<Array<{ count: number; resetAt: Date }>>`
+        INSERT INTO rate_limits (id, count, "resetAt", "createdAt", "updatedAt")
+        VALUES (${key}, 1, ${nextResetAt}, ${now}, ${now})
+        ON CONFLICT (id) DO UPDATE
+        SET
+          count = CASE
+            WHEN rate_limits."resetAt" <= ${now} THEN 1
+            ELSE rate_limits.count + 1
+          END,
+          "resetAt" = CASE
+            WHEN rate_limits."resetAt" <= ${now} THEN ${nextResetAt}
+            ELSE rate_limits."resetAt"
+          END,
+          "updatedAt" = ${now}
+        RETURNING count, "resetAt"
+      `;
 
-        if (!existing || existing.resetAt <= now) {
-          return tx.rateLimit.upsert({
-            where: { id: key },
-            update: { count: 1, resetAt: nextResetAt },
-            create: { id: key, count: 1, resetAt: nextResetAt },
-          });
-        }
-
-        return tx.rateLimit.update({
-          where: { id: key },
-          data: { count: { increment: 1 } },
-        });
-      });
-
+      const record = rows[0] ?? { count: 1, resetAt: nextResetAt };
       return {
         allowed: record.count <= limit,
         remaining: Math.max(0, limit - record.count),
-        resetAt: record.resetAt,
+        resetAt: new Date(record.resetAt),
       };
     } catch (error) {
       console.error('[RateLimitService] Store error:', error);

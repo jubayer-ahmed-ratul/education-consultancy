@@ -46,47 +46,45 @@ export const inquiryService = {
       }
     }
 
-    // Retry loop for reference number collision resilience
+    // Atomic standalone counter increment + inquiry insert (avoids holding row locks across interactive transactions)
     let created = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < 5; attempt++) {
       try {
-        created = await prisma.$transaction(async (tx) => {
-          const referenceNumber = await counterService.generateInquiryReference(tx);
-          return tx.inquiry.create({
-            data: {
-              referenceNumber,
-              studentFirstName: input.student.firstName,
-              studentLastName: input.student.lastName,
-              studentEmail: input.student.email.toLowerCase(),
-              studentPhone: input.student.phone ?? null,
-              studentNationality: input.student.nationality ?? null,
-              currentEducationLevel: input.academic.currentEducationLevel,
-              fieldOfStudy: input.academic.fieldOfStudy ?? null,
-              gpa: input.academic.gpa ?? null,
-              englishProficiency: input.academic.englishProficiency ?? null,
-              preferredCountryId: input.preferredCountry ?? null,
-              preferredUniversityId: input.preferredUniversity ?? null,
-              intendedProgram: input.intendedProgram ?? null,
-              intakeYear: input.intakeYear ?? null,
-              intakeSemester: input.intakeSemester ?? null,
-              category: input.category,
-              message: input.message,
-              status: InquiryStatus.new,
-              priority: 'normal',
-            },
-            select: {
-              id: true,
-              referenceNumber: true,
-              status: true,
-              createdAt: true,
-            },
-          });
+        const referenceNumber = await counterService.generateInquiryReference(prisma);
+        created = await prisma.inquiry.create({
+          data: {
+            referenceNumber,
+            studentFirstName: input.student.firstName,
+            studentLastName: input.student.lastName,
+            studentEmail: input.student.email.toLowerCase(),
+            studentPhone: input.student.phone ?? null,
+            studentNationality: input.student.nationality ?? null,
+            currentEducationLevel: input.academic.currentEducationLevel,
+            fieldOfStudy: input.academic.fieldOfStudy ?? null,
+            gpa: input.academic.gpa ?? null,
+            englishProficiency: input.academic.englishProficiency ?? null,
+            preferredCountryId: input.preferredCountry ?? null,
+            preferredUniversityId: input.preferredUniversity ?? null,
+            intendedProgram: input.intendedProgram ?? null,
+            intakeYear: input.intakeYear ?? null,
+            intakeSemester: input.intakeSemester ?? null,
+            category: input.category,
+            message: input.message,
+            status: InquiryStatus.new,
+            priority: 'normal',
+          },
+          select: {
+            id: true,
+            referenceNumber: true,
+            status: true,
+            createdAt: true,
+          },
         });
         break;
       } catch (err) {
         const isUniqueViolation =
           err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002';
-        if (!isUniqueViolation || attempt === 2) {
+        if (!isUniqueViolation || attempt === 4) {
           throw err;
         }
       }
