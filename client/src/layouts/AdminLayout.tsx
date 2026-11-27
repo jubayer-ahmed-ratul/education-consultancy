@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Activity,
   Award,
@@ -109,6 +109,14 @@ export default function AdminLayout() {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isNavItemActive = (item: NavItem) => {
+    if (item.end || item.to === '/admin') {
+      return pathname === '/admin' || pathname === '/admin/' || pathname === '/admin/dashboard';
+    }
+    return pathname === item.to || pathname.startsWith(`${item.to}/`);
+  };
 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -224,51 +232,48 @@ export default function AdminLayout() {
               {(!isGroupCollapsed || isCollapsed) &&
                 group.items.map((item) => {
                   const Icon = item.icon;
+                  const isActive = isNavItemActive(item);
                   return (
                     <Tooltip key={item.to} delayDuration={200}>
                       <TooltipTrigger asChild>
-                        <NavLink
+                        <Link
                           to={item.to}
-                          end={item.end}
                           onMouseEnter={() => void prefetchAdminRoute(queryClient, item.to)}
                           onFocus={() => void prefetchAdminRoute(queryClient, item.to)}
-                          onClick={() => setMobileOpen(false)}
-                          className={({ isActive }) =>
-                            `group flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-all ${
-                              isActive
-                                ? 'border border-white/80 bg-white/10 text-white font-semibold'
-                                : 'border border-transparent bg-transparent text-white/85 font-medium hover:bg-white/10 hover:text-white'
-                            }`
-                          }
+                          onClick={(e) => {
+                            e.currentTarget.blur();
+                            setMobileOpen(false);
+                          }}
+                          className={`group flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-all outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 ${
+                            isActive
+                              ? 'border-2 border-white bg-white/10 text-white font-semibold'
+                              : 'border-0 bg-transparent text-white/85 font-medium hover:bg-white/10 hover:text-white'
+                          }`}
                         >
-                          {({ isActive }) => (
-                            <>
-                              <span className="flex items-center gap-3 min-w-0">
-                                <Icon
-                                  className={`h-4 w-4 shrink-0 ${
-                                    isActive ? 'text-white' : 'text-white/85 group-hover:text-white'
-                                  }`}
-                                />
-                                {!isCollapsed && (
-                                  <span className="truncate text-white">
-                                    {item.label}
-                                  </span>
-                                )}
+                          <span className="flex items-center gap-3 min-w-0">
+                            <Icon
+                              className={`h-4 w-4 shrink-0 ${
+                                isActive ? 'text-white' : 'text-white/85 group-hover:text-white'
+                              }`}
+                            />
+                            {!isCollapsed && (
+                              <span className="truncate text-white">
+                                {item.label}
                               </span>
-                              {!isCollapsed && item.badgeKey === 'inquiries' && newInquiryCount > 0 && (
-                                <span
-                                  className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
-                                    isActive
-                                      ? 'bg-white/30 text-white'
-                                      : 'bg-white/20 text-white'
-                                  }`}
-                                >
-                                  {newInquiryCount}
-                                </span>
-                              )}
-                            </>
+                            )}
+                          </span>
+                          {!isCollapsed && item.badgeKey === 'inquiries' && newInquiryCount > 0 && (
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
+                                isActive
+                                  ? 'bg-white/30 text-white'
+                                  : 'bg-white/20 text-white'
+                              }`}
+                            >
+                              {newInquiryCount}
+                            </span>
                           )}
-                        </NavLink>
+                        </Link>
                       </TooltipTrigger>
                       {isCollapsed && <TooltipContent side="right">{item.label}</TooltipContent>}
                     </Tooltip>
