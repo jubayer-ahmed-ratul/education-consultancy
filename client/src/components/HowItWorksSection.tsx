@@ -105,18 +105,18 @@ export function HowItWorksSection() {
               strokeLinecap="round"
               initial={{ pathLength: 0 }}
               whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 1.2, ease: 'easeOut' }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
             />
           </svg>
 
           {STEPS.map((step, idx) => (
             <motion.div
               key={step.num}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.4, ease: 'easeOut', delay: idx * 0.12 }}
+              initial={{ opacity: 0, y: 18, scale: 0.85 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.65, ease: 'easeOut', delay: idx * 0.32 }}
               style={{ left: `${step.leftPct}%`, top: `${step.topPct}%` }}
               className="absolute -translate-x-1/2 -translate-y-1/2"
             >
@@ -146,10 +146,10 @@ export function HowItWorksSection() {
           {STEPS.map((step, idx) => (
             <motion.div
               key={step.num}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.35, delay: idx * 0.06 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.55, ease: 'easeOut', delay: idx * 0.2 }}
               className="relative flex items-start gap-4"
             >
               <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-600 font-display text-sm font-bold text-white shadow-md ring-4 ring-white">
