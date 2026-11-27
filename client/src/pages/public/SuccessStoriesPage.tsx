@@ -13,7 +13,7 @@ export default function SuccessStoriesPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-10 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>{settings?.seoTitle || settings?.heroHeading || 'Success Stories'} — Zero Compile</title>
+        <title>{settings?.seoTitle || settings?.heroHeading || 'Success Stories'} â€” StudySphere</title>
         {settings?.seoDescription && <meta name="description" content={settings.seoDescription} />}
       </Helmet>
 
@@ -49,14 +49,14 @@ export default function SuccessStoriesPage() {
                 </div>
                 <h2 className="font-display text-lg font-bold text-zinc-950">{s.name}</h2>
                 <div className="text-xs font-semibold text-teal-700">
-                  {s.program} — {s.university}
+                  {s.program} â€” {s.university}
                 </div>
                 {s.achievement && (
                   <Badge variant="success" className="bg-teal-50 text-teal-700 border-teal-200">
                     {s.achievement}
                   </Badge>
                 )}
-                <p className="text-sm leading-relaxed text-zinc-700">“{s.testimonial}”</p>
+                <p className="text-sm leading-relaxed text-zinc-700">â€œ{s.testimonial}â€</p>
               </div>
               {s.youtubeUrl && (
                 <a

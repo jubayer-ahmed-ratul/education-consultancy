@@ -50,7 +50,7 @@ export async function seedAdmin(prisma: PrismaClient): Promise<void> {
       return;
     }
 
-    const name = process.env.SUPER_ADMIN_NAME?.trim() || 'Zero Compile Super Admin';
+    const name = process.env.SUPER_ADMIN_NAME?.trim() || 'StudySphere Super Admin';
     const email = (process.env.SUPER_ADMIN_EMAIL?.trim() || 'admin@zerocompile.example').toLowerCase();
     const plainPassword = process.env.SUPER_ADMIN_PASSWORD || 'ChangeMe123!';
 

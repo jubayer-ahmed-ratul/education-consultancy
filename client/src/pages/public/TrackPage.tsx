@@ -98,7 +98,7 @@ export default function TrackPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>Track Application — Zero Compile</title>
+        <title>Track Application â€” StudySphere</title>
       </Helmet>
 
       <div className="space-y-1 border-b border-zinc-200 pb-5">
@@ -172,18 +172,18 @@ export default function TrackPage() {
               <div className="grid grid-cols-1 gap-3 rounded-lg bg-[#F8FAFC] p-4 text-xs text-zinc-700 ring-1 ring-zinc-950/10 sm:grid-cols-2">
                 <div>
                   <strong className="text-zinc-950">Country:</strong>{' '}
-                  {trackResult.preferredCountry || '—'}
+                  {trackResult.preferredCountry || 'â€”'}
                 </div>
                 <div>
                   <strong className="text-zinc-950">University:</strong>{' '}
-                  {trackResult.preferredUniversity || '—'}
+                  {trackResult.preferredUniversity || 'â€”'}
                 </div>
                 <div>
                   <strong className="text-zinc-950">Program:</strong>{' '}
-                  {trackResult.intendedProgram || '—'}
+                  {trackResult.intendedProgram || 'â€”'}
                 </div>
                 <div>
-                  <strong className="text-zinc-950">Intake:</strong> {trackResult.intake || '—'}
+                  <strong className="text-zinc-950">Intake:</strong> {trackResult.intake || 'â€”'}
                 </div>
               </div>
 
@@ -223,7 +223,7 @@ export default function TrackPage() {
                           </span>
                           <span className="font-mono text-[11px] uppercase text-zinc-600">
                             {step.status}
-                            {step.date ? ` • ${step.date}` : ''}
+                            {step.date ? ` â€¢ ${step.date}` : ''}
                           </span>
                         </div>
                         <div className="mt-0.5 text-xs text-zinc-700">{step.description}</div>
@@ -318,9 +318,9 @@ export default function TrackPage() {
                   <li key={app.trackingId} className="flex items-center justify-between py-3">
                     <div>
                       <span className="font-mono font-bold text-teal-700">{app.trackingId}</span>{' '}
-                      <span className="text-xs font-medium text-zinc-950">— {app.statusLabel}</span>
+                      <span className="text-xs font-medium text-zinc-950">â€” {app.statusLabel}</span>
                       <div className="text-xs text-zinc-600">
-                        {app.preferredCountry || 'General'} • Submitted {app.submittedAt}
+                        {app.preferredCountry || 'General'} â€¢ Submitted {app.submittedAt}
                       </div>
                     </div>
                     <Button

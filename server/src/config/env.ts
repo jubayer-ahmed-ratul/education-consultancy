@@ -4,7 +4,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(5000),
-  APP_NAME: z.string().trim().min(1).default('Zero Compile'),
+  APP_NAME: z.string().trim().min(1).default('StudySphere'),
   REF_CODE_PREFIX: z.string().trim().min(2).max(10).default('ZRC'),
   AUTH_URL: z.string().trim().default('http://localhost:5173'),
   CLIENT_ORIGIN: z.string().trim().default('http://localhost:5173'),
@@ -21,7 +21,7 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().optional().default(''),
   CLOUDINARY_API_SECRET: z.string().optional().default(''),
   EMAIL_PROVIDER: z.enum(['console', 'resend', 'smtp']).default('console'),
-  EMAIL_FROM: z.string().default('Zero Compile <no-reply@zerocompile.example>'),
+  EMAIL_FROM: z.string().default('StudySphere <no-reply@studysphere.example>'),
   RESEND_API_KEY: z.string().optional().default(''),
   SMTP_HOST: z.string().optional().default(''),
   SMTP_PORT: z.coerce.number().int().positive().default(587),

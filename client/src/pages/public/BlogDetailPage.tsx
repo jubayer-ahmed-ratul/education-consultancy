@@ -49,7 +49,7 @@ export default function BlogDetailPage() {
   return (
     <article className="mx-auto max-w-11/12 space-y-6 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>{b.seoTitle || b.title} — Zero Compile</title>
+        <title>{b.seoTitle || b.title} â€” StudySphere</title>
         <meta name="description" content={b.seoDescription || b.excerpt} />
       </Helmet>
 
@@ -62,7 +62,7 @@ export default function BlogDetailPage() {
 
       <div className="space-y-5 rounded-xl bg-white p-6 ring-1 ring-zinc-950/10 sm:p-10">
         <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
-          {b.category} • {b.author}
+          {b.category} â€¢ {b.author}
         </div>
         <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-zinc-950">
           {b.title}

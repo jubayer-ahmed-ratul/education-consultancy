@@ -40,7 +40,7 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>{about?.seoTitle || 'About Us'} — Zero Compile</title>
+        <title>{about?.seoTitle || 'About Us'} â€” StudySphere</title>
         {about?.seoDescription && <meta name="description" content={about.seoDescription} />}
       </Helmet>
 
@@ -49,7 +49,7 @@ export default function AboutPage() {
           Our Consultancy
         </span>
         <h1 className="font-display text-3xl font-bold tracking-tight text-zinc-950">
-          {about?.whoWeAreTitle || 'About Zero Compile'}
+          {about?.whoWeAreTitle || 'About StudySphere'}
         </h1>
         <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-700">
           {about?.whoWeAreBody}
@@ -79,10 +79,10 @@ export default function AboutPage() {
       {about?.chairmanMessage && (
         <section className="space-y-3 rounded-xl bg-white p-6 ring-1 ring-zinc-950/10 sm:p-8">
           <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
-            {about.chairmanTitle} — {about.chairmanName}
+            {about.chairmanTitle} â€” {about.chairmanName}
           </div>
           <p className="text-base italic leading-relaxed text-zinc-950">
-            “{about.chairmanMessage}”
+            â€œ{about.chairmanMessage}â€
           </p>
         </section>
       )}

@@ -236,7 +236,7 @@ export default function CountriesPage() {
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>Countries — Zero Compile Admin</title>
+        <title>Countries â€” StudySphere Admin</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4">

@@ -156,7 +156,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <Helmet>
-        <title>Dashboard — Zero Compile Admin</title>
+        <title>Dashboard â€” StudySphere Admin</title>
       </Helmet>
 
       {/* Top Greeting */}
@@ -171,7 +171,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Top Row — 4 Monochrome KPI Stat Cards */}
+      {/* Top Row â€” 4 Monochrome KPI Stat Cards */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {statsCards.map((stat) => {
           const Icon = stat.icon;
@@ -314,7 +314,7 @@ export default function DashboardPage() {
               to="/admin/inquiries"
               className="text-xs font-bold text-teal-700 hover:text-teal-800"
             >
-              View All →
+              View All â†’
             </Link>
           </div>
 
@@ -346,7 +346,7 @@ export default function DashboardPage() {
                         {inq.studentFirstName} {inq.studentLastName}
                       </div>
                       <div className="truncate font-mono text-[11px] font-medium text-zinc-600">
-                        {inq.referenceNumber} •{' '}
+                        {inq.referenceNumber} â€¢{' '}
                         {inq.preferredCountry?.name ?? new Date(inq.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -392,7 +392,7 @@ export default function DashboardPage() {
                 to="/admin/activity-logs"
                 className="text-xs font-bold text-teal-700 hover:text-teal-800"
               >
-                View All →
+                View All â†’
               </Link>
             )}
           </div>
@@ -431,7 +431,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Inquiries Breakdown — Monochrome Donut Chart */}
+        {/* Inquiries Breakdown â€” Monochrome Donut Chart */}
         <div className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-xs lg:col-span-4">
           <h2 className="text-base font-bold text-zinc-950">Inquiries Breakdown</h2>
 

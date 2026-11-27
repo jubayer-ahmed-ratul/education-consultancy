@@ -54,7 +54,7 @@ export default function UniversityDetailPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>{u.name} — Zero Compile</title>
+        <title>{u.name} â€” StudySphere</title>
         <meta name="description" content={u.description.slice(0, 155)} />
       </Helmet>
 
@@ -88,7 +88,7 @@ export default function UniversityDetailPage() {
           <div className="rounded-lg bg-[#F8FAFC] p-4 text-sm ring-1 ring-zinc-950/10">
             <span className="font-semibold text-zinc-950">Estimated Tuition:</span>{' '}
             <span className="font-mono font-bold text-teal-700">
-              {u.tuitionRange.currency} {u.tuitionRange.min.toLocaleString()} –{' '}
+              {u.tuitionRange.currency} {u.tuitionRange.min.toLocaleString()} â€“{' '}
               {u.tuitionRange.max.toLocaleString()} / year
             </span>
           </div>

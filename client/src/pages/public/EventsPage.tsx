@@ -32,7 +32,7 @@ export default function EventsPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>Events & Fairs — Zero Compile</title>
+        <title>Events & Fairs â€” StudySphere</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-6">

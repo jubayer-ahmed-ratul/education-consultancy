@@ -46,7 +46,7 @@ export default function DestinationsPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>Study Destinations — Zero Compile</title>
+        <title>Study Destinations â€” StudySphere</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-6">

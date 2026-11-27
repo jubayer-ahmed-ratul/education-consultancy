@@ -86,7 +86,7 @@ export default function ActivityLogsPage() {
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>Activity Logs — Zero Compile Admin</title>
+        <title>Activity Logs â€” StudySphere Admin</title>
       </Helmet>
 
       <div className="space-y-1">

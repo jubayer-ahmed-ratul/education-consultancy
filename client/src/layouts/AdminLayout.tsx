@@ -193,7 +193,7 @@ export default function AdminLayout() {
           </span>
           {!isCollapsed && (
             <div className="flex items-center gap-2 truncate">
-              <span className="text-sm font-bold tracking-tight text-white">Zero Compile</span>
+              <span className="text-sm font-bold tracking-tight text-white">StudySphere</span>
               <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-semibold text-white">
                 Admin
               </span>
@@ -361,7 +361,7 @@ export default function AdminLayout() {
                   <span>Search anything...</span>
                 </span>
                 <kbd className="rounded-full bg-zinc-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-700">
-                  ⌘K
+                  âŒ˜K
                 </kbd>
               </button>
 

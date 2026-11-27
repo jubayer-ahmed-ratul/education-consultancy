@@ -40,7 +40,7 @@ export default function ContactPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>{contact?.seoTitle || 'Contact Us'} — Zero Compile</title>
+        <title>{contact?.seoTitle || 'Contact Us'} â€” StudySphere</title>
         {contact?.seoDescription && <meta name="description" content={contact.seoDescription} />}
       </Helmet>
 
@@ -49,7 +49,7 @@ export default function ContactPage() {
           Admissions Desk
         </span>
         <h1 className="font-display text-3xl font-bold tracking-tight text-zinc-950">
-          {contact?.headerTitle || 'Contact Zero Compile'}
+          {contact?.headerTitle || 'Contact StudySphere'}
         </h1>
         <p className="text-sm text-zinc-700">{contact?.headerSubtitle}</p>
       </div>
@@ -74,7 +74,7 @@ export default function ContactPage() {
             <Phone className="mt-1 h-4 w-4 shrink-0 text-teal-600" />
             <div>
               <div className="font-semibold text-zinc-950">Phone & WhatsApp</div>
-              <div className="text-zinc-700">{contact?.phones.join(', ') || '—'}</div>
+              <div className="text-zinc-700">{contact?.phones.join(', ') || 'â€”'}</div>
               {contact?.whatsappNumber && (
                 <div className="text-xs text-zinc-600">WhatsApp: {contact.whatsappNumber}</div>
               )}
@@ -84,7 +84,7 @@ export default function ContactPage() {
             <Mail className="mt-1 h-4 w-4 shrink-0 text-teal-600" />
             <div>
               <div className="font-semibold text-zinc-950">Email</div>
-              <div className="text-zinc-700">{contact?.emails.join(', ') || '—'}</div>
+              <div className="text-zinc-700">{contact?.emails.join(', ') || 'â€”'}</div>
             </div>
           </div>
         </div>

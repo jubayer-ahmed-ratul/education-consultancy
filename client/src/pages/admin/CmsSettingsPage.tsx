@@ -90,7 +90,7 @@ export default function CmsSettingsPage() {
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>Page Content & Settings — Zero Compile Admin</title>
+        <title>Page Content & Settings â€” StudySphere Admin</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4">

@@ -133,7 +133,7 @@ export default function ApplyPage() {
     return (
       <div className="mx-auto max-w-xl px-4 py-14 sm:px-6">
         <Helmet>
-          <title>Inquiry Submitted — Zero Compile</title>
+          <title>Inquiry Submitted â€” StudySphere</title>
         </Helmet>
         <div className="space-y-5 rounded-xl bg-white p-8 text-center ring-1 ring-zinc-950/10">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-700 ring-1 ring-teal-200">
@@ -183,7 +183,7 @@ export default function ApplyPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>Book Free Consultation — Zero Compile</title>
+        <title>Book Free Consultation â€” StudySphere</title>
       </Helmet>
 
       <div className="space-y-1 border-b border-zinc-200 pb-5">
@@ -425,7 +425,7 @@ export default function ApplyPage() {
                 onChange={(e) => setMessage(e.target.value)}
               />
               <div className="rounded-lg bg-[#F8FAFC] p-3.5 text-xs text-zinc-700 ring-1 ring-zinc-950/10">
-                Submitting for <strong className="text-zinc-950">{firstName} {lastName}</strong> ({email}) •{' '}
+                Submitting for <strong className="text-zinc-950">{firstName} {lastName}</strong> ({email}) â€¢{' '}
                 {currentEducationLevel}
               </div>
             </motion.div>

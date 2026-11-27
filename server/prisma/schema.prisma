@@ -328,7 +328,7 @@ model Blog {
   content        String    @db.Text
   featuredImage  Json?
   category       String    @default("Study Abroad Guide") @db.VarChar(100)
-  author         String    @default("Zero Compile Editorial Desk") @db.VarChar(100)
+  author         String    @default("StudySphere Editorial Desk") @db.VarChar(100)
   isPublished    Boolean   @default(false)
   publishedAt    DateTime?
   seoTitle       String?   @db.VarChar(100)
@@ -482,7 +482,7 @@ model AboutPage {
 model ContactPage {
   id             String   @id @default(uuid())
   key            String   @unique @default("contact-page") @db.VarChar(100)
-  headerTitle    String   @default("Contact Zero Compile") @db.VarChar(200)
+  headerTitle    String   @default("Contact StudySphere") @db.VarChar(200)
   headerSubtitle String   @default("Speak with our admissions counselors.") @db.VarChar(500)
   address        String   @default("") @db.VarChar(500)
   phones         String[] @default([])

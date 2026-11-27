@@ -167,7 +167,7 @@ export default function InquiryDetailPage() {
   return (
     <div className="space-y-6">
       <Helmet>
-        <title>{inq.referenceNumber} — Zero Compile Admin</title>
+        <title>{inq.referenceNumber} â€” StudySphere Admin</title>
       </Helmet>
 
       {/* Filament Breadcrumbs + Header */}
@@ -210,26 +210,26 @@ export default function InquiryDetailPage() {
                 </div>
                 <div>
                   <dt className="text-xs font-medium text-gray-500">Phone / Nationality</dt>
-                  <dd className="mt-1 text-gray-900">{inq.studentPhone || '—'} / {inq.studentNationality || '—'}</dd>
+                  <dd className="mt-1 text-gray-900">{inq.studentPhone || 'â€”'} / {inq.studentNationality || 'â€”'}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium text-gray-500">Academic Background</dt>
                   <dd className="mt-1 text-gray-900">
-                    {inq.currentEducationLevel} • {inq.fieldOfStudy || '—'} (GPA: {inq.gpa || '—'})
+                    {inq.currentEducationLevel} â€¢ {inq.fieldOfStudy || 'â€”'} (GPA: {inq.gpa || 'â€”'})
                   </dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium text-gray-500">English Proficiency</dt>
-                  <dd className="mt-1 text-gray-900">{inq.englishProficiency || '—'}</dd>
+                  <dd className="mt-1 text-gray-900">{inq.englishProficiency || 'â€”'}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium text-gray-500">Target Destination</dt>
-                  <dd className="mt-1 text-gray-900">{inq.preferredCountry?.name || '—'}</dd>
+                  <dd className="mt-1 text-gray-900">{inq.preferredCountry?.name || 'â€”'}</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium text-gray-500">Target University & Program</dt>
                   <dd className="mt-1 text-gray-900">
-                    {inq.preferredUniversity?.name || '—'} • {inq.intendedProgram || '—'} ({inq.intakeSemester || ''} {inq.intakeYear || ''})
+                    {inq.preferredUniversity?.name || 'â€”'} â€¢ {inq.intendedProgram || 'â€”'} ({inq.intakeSemester || ''} {inq.intakeYear || ''})
                   </dd>
                 </div>
               </dl>
@@ -408,7 +408,7 @@ export default function InquiryDetailPage() {
                   <div key={log.id} className="border-b border-gray-950/5 pb-2 text-xs last:border-0">
                     <div className="font-mono font-semibold text-teal-700">{log.action}</div>
                     <div className="text-gray-500">
-                      {log.performedBy?.name ?? 'Public / System'} •{' '}
+                      {log.performedBy?.name ?? 'Public / System'} â€¢{' '}
                       <span className="font-mono">{new Date(log.createdAt).toLocaleString()}</span>
                     </div>
                   </div>

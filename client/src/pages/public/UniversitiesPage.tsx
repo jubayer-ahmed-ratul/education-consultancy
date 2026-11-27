@@ -63,7 +63,7 @@ export default function UniversitiesPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>Partner Universities — Zero Compile</title>
+        <title>Partner Universities â€” StudySphere</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-6">
@@ -173,7 +173,7 @@ export default function UniversitiesPage() {
               <div className="flex items-center justify-between border-t border-zinc-200 pt-3 text-xs">
                 <span className="font-mono font-semibold text-zinc-950">
                   {u.tuitionRange
-                    ? `${u.tuitionRange.currency} ${u.tuitionRange.min.toLocaleString()}–${u.tuitionRange.max.toLocaleString()}`
+                    ? `${u.tuitionRange.currency} ${u.tuitionRange.min.toLocaleString()}â€“${u.tuitionRange.max.toLocaleString()}`
                     : `${u.programs?.length || 0} Programs`}
                 </span>
                 <span className="inline-flex items-center gap-1 font-semibold text-teal-700">

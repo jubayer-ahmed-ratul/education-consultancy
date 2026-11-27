@@ -63,7 +63,7 @@ export default function DestinationDetailPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>Study in {c.name} — Zero Compile</title>
+        <title>Study in {c.name} â€” StudySphere</title>
         <meta name="description" content={c.description.slice(0, 155)} />
       </Helmet>
 

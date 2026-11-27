@@ -55,7 +55,7 @@ export default function EventDetailPage() {
   return (
     <div className="mx-auto max-w-11/12 space-y-6 px-4 py-10 sm:px-6">
       <Helmet>
-        <title>{ev.seoTitle || ev.title} — Zero Compile</title>
+        <title>{ev.seoTitle || ev.title} â€” StudySphere</title>
         <meta name="description" content={ev.seoDescription || ev.shortDescription} />
       </Helmet>
 
@@ -80,7 +80,7 @@ export default function EventDetailPage() {
           <div className="flex items-center gap-2 text-zinc-950">
             <Clock className="h-4 w-4 text-teal-600" />
             <span className="text-xs">
-              {ev.startTime} – {ev.endTime}
+              {ev.startTime} â€“ {ev.endTime}
             </span>
           </div>
           <div className="flex items-center gap-2 text-zinc-950">

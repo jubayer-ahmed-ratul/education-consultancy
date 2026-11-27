@@ -112,7 +112,7 @@ export default function InquiriesListPage() {
         header: 'Country',
         accessorFn: (r) => r.preferredCountry?.name ?? '',
         cell: ({ row }) => (
-          <span className="text-xs text-gray-600">{row.original.preferredCountry?.name ?? '—'}</span>
+          <span className="text-xs text-gray-600">{row.original.preferredCountry?.name ?? 'â€”'}</span>
         ),
       },
       {
@@ -171,7 +171,7 @@ export default function InquiriesListPage() {
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>Inquiries — Zero Compile Admin</title>
+        <title>Inquiries â€” StudySphere Admin</title>
       </Helmet>
 
       {/* Filament Page Header */}
@@ -275,8 +275,8 @@ export default function InquiriesListPage() {
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
-              <option value="priority_desc">Priority High → Low</option>
-              <option value="priority_asc">Priority Low → High</option>
+              <option value="priority_desc">Priority High â†’ Low</option>
+              <option value="priority_asc">Priority Low â†’ High</option>
             </Select>
           </>
         }

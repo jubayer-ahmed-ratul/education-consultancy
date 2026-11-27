@@ -160,7 +160,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>Team & Roles — Zero Compile Admin</title>
+        <title>Team & Roles â€” StudySphere Admin</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4">

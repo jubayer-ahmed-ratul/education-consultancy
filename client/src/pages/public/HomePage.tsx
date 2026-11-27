@@ -124,7 +124,7 @@ export default function HomePage() {
   return (
     <div className="space-y-20 pb-24">
       <Helmet>
-        <title>Zero Compile — Global Higher Education Consultancy</title>
+        <title>StudySphere â€” Global Higher Education Consultancy</title>
         <meta
           name="description"
           content={hero?.description || 'Study abroad admissions, scholarships, and visa guidance.'}
@@ -143,7 +143,7 @@ export default function HomePage() {
             >
               <div className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-teal-700 ring-1 ring-inset ring-teal-200">
                 <Sparkles className="h-3.5 w-3.5 text-teal-600" />
-                {hero?.subheading || 'Zero Compile Overseas Consultancy'}
+                {hero?.subheading || 'StudySphere Overseas Consultancy'}
               </div>
 
               <h1 className="font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-zinc-950 sm:text-5xl lg:text-[3.25rem]">
@@ -314,7 +314,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center justify-between border-t border-zinc-200 pt-3 text-xs">
                   <span className="font-medium text-zinc-600">
-                    {c.intakes.length > 0 ? `Intakes: ${c.intakes.slice(0, 2).join(' • ')}` : 'Multiple intakes'}
+                    {c.intakes.length > 0 ? `Intakes: ${c.intakes.slice(0, 2).join(' â€¢ ')}` : 'Multiple intakes'}
                   </span>
                   <span className="inline-flex items-center gap-1 font-semibold text-teal-700">
                     Guide <ArrowRight className="h-3.5 w-3.5" />
@@ -407,7 +407,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works — 4-Step Admission Process */}
+      {/* How It Works â€” 4-Step Admission Process */}
       <section className="border-y border-zinc-200 bg-white py-16">
         <div className="mx-auto max-w-11/12 space-y-10 px-4 sm:px-6">
           <div className="max-w-2xl space-y-2">
@@ -500,14 +500,14 @@ export default function HomePage() {
                   </div>
                   <div className="font-display text-base font-bold text-zinc-950">{s.name}</div>
                   <div className="text-xs font-semibold text-teal-700">
-                    {s.program} — {s.university}
+                    {s.program} â€” {s.university}
                   </div>
                   {s.achievement && (
                     <Badge variant="success" className="bg-teal-50 text-teal-700 border-teal-200">
                       {s.achievement}
                     </Badge>
                   )}
-                  <p className="text-xs leading-relaxed text-zinc-700 line-clamp-4">“{s.testimonial}”</p>
+                  <p className="text-xs leading-relaxed text-zinc-700 line-clamp-4">â€œ{s.testimonial}â€</p>
                 </div>
               ))}
             </div>
@@ -566,7 +566,7 @@ export default function HomePage() {
                 className="block rounded-xl bg-white p-4 ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40"
               >
                 <div className="font-mono text-[11px] font-semibold text-teal-700">
-                  {new Date(ev.eventDate).toLocaleDateString()} • {ev.venue}
+                  {new Date(ev.eventDate).toLocaleDateString()} â€¢ {ev.venue}
                 </div>
                 <div className="mt-1 font-display font-bold text-zinc-950">{ev.title}</div>
                 <p className="mt-1 text-xs text-zinc-700 line-clamp-2">{ev.shortDescription}</p>

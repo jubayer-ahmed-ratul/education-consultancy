@@ -161,12 +161,12 @@ export default function UniversitiesPage() {
         id: 'country',
         header: 'Country',
         accessorFn: (r) => r.country?.name ?? '',
-        cell: ({ row }) => <span className="text-xs text-gray-600">{row.original.country?.name ?? '—'}</span>,
+        cell: ({ row }) => <span className="text-xs text-gray-600">{row.original.country?.name ?? 'â€”'}</span>,
       },
       {
         accessorKey: 'city',
         header: 'City',
-        cell: ({ row }) => <span className="text-xs text-gray-500">{row.original.city ?? '—'}</span>,
+        cell: ({ row }) => <span className="text-xs text-gray-500">{row.original.city ?? 'â€”'}</span>,
       },
       {
         accessorKey: 'isPublished',
@@ -216,7 +216,7 @@ export default function UniversitiesPage() {
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>Universities — Zero Compile Admin</title>
+        <title>Universities â€” StudySphere Admin</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4">

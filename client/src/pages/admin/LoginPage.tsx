@@ -44,7 +44,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
       <Helmet>
-        <title>Sign in — Zero Compile Admin</title>
+        <title>Sign in â€” StudySphere Admin</title>
       </Helmet>
 
       <div className="mb-6 flex items-center gap-3">
@@ -52,7 +52,7 @@ export default function LoginPage() {
           <Compass className="h-5 w-5" />
         </span>
         <div>
-          <div className="text-lg font-bold tracking-tight text-gray-950">Zero Compile</div>
+          <div className="text-lg font-bold tracking-tight text-gray-950">StudySphere</div>
           <div className="text-xs font-medium text-teal-600">Admin Panel</div>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function LoginPage() {
           <CardTitle className="flex items-center gap-2">
             <Lock className="h-4 w-4 text-teal-600" /> Sign in
           </CardTitle>
-          <CardDescription>Access the Zero Compile admissions & CMS workspace.</CardDescription>
+          <CardDescription>Access the StudySphere admissions & CMS workspace.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,7 +101,7 @@ export default function LoginPage() {
       </Card>
 
       <Link to="/" className="mt-6 text-xs text-gray-500 hover:text-gray-900 hover:underline">
-        ← Back to public website
+        â† Back to public website
       </Link>
     </div>
   );

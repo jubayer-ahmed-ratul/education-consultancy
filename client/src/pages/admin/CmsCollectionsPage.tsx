@@ -225,7 +225,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
   return (
     <div className="space-y-5">
       <Helmet>
-        <title>{TITLES[kind]} — Zero Compile Admin</title>
+        <title>{TITLES[kind]} â€” StudySphere Admin</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -256,7 +256,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
                   <Input required placeholder="Blog Title *" value={val('title')} onChange={(e) => setField('title', e.target.value)} />
                   <div className="grid grid-cols-2 gap-3">
                     <Input placeholder="Category" value={val('category', 'Study Abroad Guide')} onChange={(e) => setField('category', e.target.value)} />
-                    <Input placeholder="Author" value={val('author', 'Zero Compile Editorial Desk')} onChange={(e) => setField('author', e.target.value)} />
+                    <Input placeholder="Author" value={val('author', 'StudySphere Editorial Desk')} onChange={(e) => setField('author', e.target.value)} />
                   </div>
                   <Input required placeholder="Excerpt *" value={val('excerpt')} onChange={(e) => setField('excerpt', e.target.value)} />
                   <Textarea required rows={6} placeholder="Full Content *" value={val('content')} onChange={(e) => setField('content', e.target.value)} />

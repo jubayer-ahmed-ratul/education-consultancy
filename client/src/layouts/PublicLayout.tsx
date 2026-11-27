@@ -51,7 +51,7 @@ export default function PublicLayout() {
               <Compass className="h-4.5 w-4.5" />
             </span>
             <span className="font-display text-lg font-extrabold tracking-tight text-zinc-950">
-              Zero Compile
+              StudySphere
             </span>
           </Link>
 
@@ -107,7 +107,7 @@ export default function PublicLayout() {
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 text-white">
                 <Compass className="h-4 w-4" />
               </span>
-              <span className="font-display text-base font-extrabold tracking-tight">Zero Compile</span>
+              <span className="font-display text-base font-extrabold tracking-tight">StudySphere</span>
             </SheetTitle>
           </SheetHeader>
           <div className="flex flex-col justify-between p-4 space-y-6">
@@ -160,7 +160,7 @@ export default function PublicLayout() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 text-white">
                   <Compass className="h-4 w-4" />
                 </span>
-                <span className="font-display text-lg font-bold text-white">Zero Compile</span>
+                <span className="font-display text-lg font-bold text-white">StudySphere</span>
               </div>
               <p className="max-w-md text-sm leading-relaxed text-zinc-300">
                 {bundle?.siteContent?.highlightTitle ||
@@ -226,7 +226,7 @@ export default function PublicLayout() {
                     onMouseEnter={handlePrefetch('/about')}
                     className="transition-colors hover:text-white"
                   >
-                    About Zero Compile
+                    About StudySphere
                   </Link>
                 </li>
                 <li>
@@ -265,7 +265,7 @@ export default function PublicLayout() {
           )}
 
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-zinc-800 pt-6 text-xs text-zinc-400">
-            <span>© {new Date().getFullYear()} Zero Compile. All rights reserved.</span>
+            <span>Â© {new Date().getFullYear()} StudySphere. All rights reserved.</span>
             <span>
               Reference Prefix: <code className="text-zinc-200">ZRC-YYYY-XXX</code>
             </span>

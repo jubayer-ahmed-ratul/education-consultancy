@@ -9,7 +9,7 @@ export const blogSchema = z.object({
   content: z.string().trim().min(1),
   featuredImage: cloudinaryImageSchema.optional().nullable(),
   category: z.string().trim().max(100).default('Study Abroad Guide'),
-  author: z.string().trim().max(100).default('Zero Compile Editorial Desk'),
+  author: z.string().trim().max(100).default('StudySphere Editorial Desk'),
   isPublished: z.boolean().default(false),
   publishedAt: z.coerce.date().optional().nullable(),
   seoTitle: z.string().trim().max(100).optional().nullable(),
@@ -135,7 +135,7 @@ export const aboutPageSchema = z.object({
 });
 
 export const contactPageSchema = z.object({
-  headerTitle: z.string().trim().max(200).default('Contact Zero Compile'),
+  headerTitle: z.string().trim().max(200).default('Contact StudySphere'),
   headerSubtitle: z.string().trim().max(500).default('Speak with our admissions counselors.'),
   address: z.string().trim().max(500).default(''),
   phones: z.array(z.string().trim().max(40)).default([]),
