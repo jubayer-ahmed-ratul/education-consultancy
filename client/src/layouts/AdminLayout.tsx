@@ -85,17 +85,12 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: 'Content & Media',
+    title: 'Site & System',
     items: [
       { to: '/admin/cms/blogs', label: 'Blogs', icon: BookOpen, permission: 'content:manage' },
       { to: '/admin/cms/events', label: 'Events', icon: Calendar, permission: 'content:manage' },
       { to: '/admin/cms/success-stories', label: 'Success Stories', icon: Award, permission: 'content:manage' },
       { to: '/admin/cms/gallery', label: 'Gallery', icon: Image, permission: 'content:manage' },
-    ],
-  },
-  {
-    title: 'Site & System',
-    items: [
       { to: '/admin/cms/sister-concerns', label: 'Sister Concerns', icon: FileText, permission: 'content:manage' },
       { to: '/admin/cms/settings', label: 'Page Content & Settings', icon: Settings, permission: 'content:manage' },
       { to: '/admin/users', label: 'Team & Roles', icon: Users, permission: 'users:manage' },
