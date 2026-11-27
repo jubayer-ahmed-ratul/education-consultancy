@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { ArrowUpRight, Compass, Menu, MessageCircle, X } from 'lucide-react';
+import { ScrollToTop } from '../components/ScrollToTop';
 import { usePublicBundle } from '../hooks/usePublicBundle';
 import { prefetchRoute } from '../lib/prefetch';
 
@@ -38,6 +39,7 @@ export default function PublicLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#FAF9F6] text-[#111827]">
+      <ScrollToTop />
       {/* Sticky Glassmorphic Editorial Header */}
       <header className="sticky top-0 z-40 h-16 border-b border-[#E5E2DC] bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
@@ -56,6 +58,7 @@ export default function PublicLayout() {
                 key={item.to}
                 to={item.to}
                 onMouseEnter={handlePrefetch(item.to)}
+                onTouchStart={handlePrefetch(item.to)}
                 onFocus={handlePrefetch(item.to)}
                 className={({ isActive }) =>
                   `transition-colors ${

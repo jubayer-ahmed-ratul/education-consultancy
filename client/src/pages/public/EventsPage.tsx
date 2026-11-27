@@ -73,6 +73,7 @@ export default function EventsPage() {
               key={ev.id}
               to={`/events/${ev.slug}`}
               onMouseEnter={() => void prefetchEvent(queryClient, ev.slug)}
+              onTouchStart={() => void prefetchEvent(queryClient, ev.slug)}
               onFocus={() => void prefetchEvent(queryClient, ev.slug)}
               className="group rounded-lg border border-[#E5E2DC] bg-white p-6 transition-all hover:border-[#CFCAC0] hover:shadow-sm space-y-3"
             >

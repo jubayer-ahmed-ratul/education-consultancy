@@ -69,6 +69,7 @@ export default function BlogsPage() {
               key={b.id}
               to={`/blogs/${b.slug}`}
               onMouseEnter={() => void prefetchBlog(queryClient, b.slug)}
+              onTouchStart={() => void prefetchBlog(queryClient, b.slug)}
               onFocus={() => void prefetchBlog(queryClient, b.slug)}
               className="group flex flex-col justify-between rounded-lg border border-[#E5E2DC] bg-white p-5 transition-all hover:border-[#CFCAC0] hover:shadow-sm space-y-3"
             >

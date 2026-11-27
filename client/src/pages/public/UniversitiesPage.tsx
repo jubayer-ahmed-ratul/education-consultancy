@@ -91,6 +91,7 @@ export default function UniversitiesPage() {
               key={u.id}
               to={`/universities/${u.slug}`}
               onMouseEnter={() => void prefetchUniversity(queryClient, u.slug)}
+              onTouchStart={() => void prefetchUniversity(queryClient, u.slug)}
               onFocus={() => void prefetchUniversity(queryClient, u.slug)}
               className="group rounded-lg border border-[#E5E2DC] bg-white p-5 transition-all hover:border-[#CFCAC0] hover:shadow-sm space-y-2"
             >

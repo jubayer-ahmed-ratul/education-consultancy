@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import type { PermissionKey } from '@zero-compile/shared';
 import { Avatar } from '../components/ui/avatar';
+import { ScrollToTop } from '../components/ScrollToTop';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
@@ -218,6 +219,7 @@ export default function AdminLayout() {
 
   return (
     <TooltipProvider>
+      <ScrollToTop />
       <div className="flex min-h-screen bg-[#FAF9F6] text-[#111827]">
         {/* Desktop Sidebar */}
         <aside

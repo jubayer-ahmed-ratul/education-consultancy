@@ -27,6 +27,19 @@ export interface ApiResult<T> {
 }
 
 const inflightGets = new Map<string, Promise<ApiResult<unknown>>>();
+const swrCache = new Map<string, { result: ApiResult<unknown>; timestamp: number }>();
+const SWR_MAX_AGE_MS = 5 * 60 * 1000;
+
+function isPublicCacheablePath(path: string): boolean {
+  return (
+    path.startsWith('/content/') ||
+    path.startsWith('/countries') ||
+    path.startsWith('/universities') ||
+    path.startsWith('/blogs') ||
+    path.startsWith('/events') ||
+    path.startsWith('/whatsapp')
+  ) && !path.includes('/admin/');
+}
 
 async function executeFetch<T>(url: string, options: RequestInit): Promise<ApiResult<T>> {
   const headers = new Headers(options.headers);
@@ -58,23 +71,47 @@ async function executeFetch<T>(url: string, options: RequestInit): Promise<ApiRe
   };
 }
 
+function fetchWithDedup<T>(url: string, options: RequestInit, cacheKey?: string): Promise<ApiResult<T>> {
+  const existing = inflightGets.get(url) as Promise<ApiResult<T>> | undefined;
+  if (existing) return existing;
+
+  const promise = executeFetch<T>(url, options)
+    .then((res) => {
+      if (cacheKey) {
+        swrCache.set(cacheKey, { result: res, timestamp: Date.now() });
+      }
+      return res;
+    })
+    .finally(() => {
+      inflightGets.delete(url);
+    });
+
+  inflightGets.set(url, promise as Promise<ApiResult<unknown>>);
+  return promise;
+}
+
 export async function apiRequest<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<ApiResult<T>> {
-  const url = `${BASE_URL}/api${path.startsWith('/') ? path : `/${path}`}`;
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const url = `${BASE_URL}/api${normalizedPath}`;
   const method = (options.method || 'GET').toUpperCase();
 
   if (method === 'GET') {
-    const existing = inflightGets.get(url) as Promise<ApiResult<T>> | undefined;
-    if (existing) return existing;
-
-    const promise = executeFetch<T>(url, options).finally(() => {
-      inflightGets.delete(url);
-    });
-    inflightGets.set(url, promise as Promise<ApiResult<unknown>>);
-    return promise;
+    const cacheable = isPublicCacheablePath(normalizedPath);
+    if (cacheable) {
+      const cached = swrCache.get(normalizedPath);
+      if (cached && Date.now() - cached.timestamp < SWR_MAX_AGE_MS) {
+        // Return immediately and revalidate silently in background
+        void fetchWithDedup<T>(url, options, normalizedPath).catch(() => undefined);
+        return cached.result as ApiResult<T>;
+      }
+    }
+    return fetchWithDedup<T>(url, options, cacheable ? normalizedPath : undefined);
   }
 
+  // Invalidate client SWR cache on mutations
+  swrCache.clear();
   return executeFetch<T>(url, options);
 }

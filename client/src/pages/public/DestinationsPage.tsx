@@ -71,6 +71,7 @@ export default function DestinationsPage() {
               key={c.id}
               to={`/destinations/${c.slug}`}
               onMouseEnter={() => void prefetchDestination(queryClient, c.slug)}
+              onTouchStart={() => void prefetchDestination(queryClient, c.slug)}
               onFocus={() => void prefetchDestination(queryClient, c.slug)}
               className="group flex flex-col rounded-lg border border-[#E5E2DC] bg-white overflow-hidden transition-all hover:border-[#CFCAC0] hover:shadow-sm"
             >

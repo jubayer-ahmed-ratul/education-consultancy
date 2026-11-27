@@ -139,6 +139,7 @@ export default function HomePage() {
               key={c.id}
               to={`/destinations/${c.slug}`}
               onMouseEnter={() => void prefetchDestination(queryClient, c.slug)}
+              onTouchStart={() => void prefetchDestination(queryClient, c.slug)}
               onFocus={() => void prefetchDestination(queryClient, c.slug)}
               className="group flex flex-col rounded-lg border border-[#E5E2DC] bg-white overflow-hidden transition-all hover:border-[#CFCAC0] hover:shadow-sm"
             >
@@ -190,6 +191,7 @@ export default function HomePage() {
               key={u.id}
               to={`/universities/${u.slug}`}
               onMouseEnter={() => void prefetchUniversity(queryClient, u.slug)}
+              onTouchStart={() => void prefetchUniversity(queryClient, u.slug)}
               onFocus={() => void prefetchUniversity(queryClient, u.slug)}
               className="group rounded-lg border border-[#E5E2DC] bg-white p-5 transition-all hover:border-[#CFCAC0] hover:shadow-sm space-y-2"
             >
@@ -280,6 +282,7 @@ export default function HomePage() {
                 key={b.id}
                 to={`/blogs/${b.slug}`}
                 onMouseEnter={() => void prefetchBlog(queryClient, b.slug)}
+                onTouchStart={() => void prefetchBlog(queryClient, b.slug)}
                 onFocus={() => void prefetchBlog(queryClient, b.slug)}
                 className="block rounded-lg border border-[#E5E2DC] bg-white p-4 transition-colors hover:border-[#CFCAC0]"
               >
@@ -304,6 +307,7 @@ export default function HomePage() {
                 key={ev.id}
                 to={`/events/${ev.slug}`}
                 onMouseEnter={() => void prefetchEvent(queryClient, ev.slug)}
+                onTouchStart={() => void prefetchEvent(queryClient, ev.slug)}
                 onFocus={() => void prefetchEvent(queryClient, ev.slug)}
                 className="block rounded-lg border border-[#E5E2DC] bg-white p-4 transition-colors hover:border-[#CFCAC0]"
               >

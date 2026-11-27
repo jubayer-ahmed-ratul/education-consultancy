@@ -8,7 +8,7 @@ const router = Router();
 
 router.use((req, res, next) => {
   if (req.method === 'GET') {
-    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
+    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300');
   }
   next();
 });
