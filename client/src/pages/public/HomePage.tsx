@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { AboutPreviewSection } from '../../components/AboutPreviewSection';
 import { AnimatedNumber } from '../../components/AnimatedNumber';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
@@ -289,6 +290,13 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* About Us 2-Column Asymmetric Section */}
+      <AboutPreviewSection
+        siteContent={about}
+        galleryItems={bundle?.galleryItems}
+        heroStats={bundle?.heroStats}
+      />
 
       {/* Featured Universities (Filterable Grid) */}
       <section className="mx-auto max-w-11/12 space-y-6 px-4 sm:px-6">
