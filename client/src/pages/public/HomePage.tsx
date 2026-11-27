@@ -9,17 +9,14 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  FileCheck2,
   Globe2,
-  GraduationCap,
-  PlaneTakeoff,
   Search,
-  UserCheck,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AboutPreviewSection } from '../../components/AboutPreviewSection';
 import { AnimatedNumber } from '../../components/AnimatedNumber';
+import { HowItWorksSection } from '../../components/HowItWorksSection';
 import { ServicesSection } from '../../components/ServicesSection';
 import { UniversitiesMarqueeSection } from '../../components/UniversitiesMarqueeSection';
 import { Badge } from '../../components/ui/badge';
@@ -34,33 +31,6 @@ const FALLBACK_DESTINATION_IMAGES = [
   '/about-primary.jpg',
   '/about-campus.jpg',
   '/about-counseling.jpg',
-];
-
-const ADMISSION_STEPS = [
-  {
-    step: '01',
-    title: 'Profile Evaluation',
-    description: 'Assess your academic background, test scores, and budget with a senior advisor.',
-    icon: UserCheck,
-  },
-  {
-    step: '02',
-    title: 'University Shortlisting',
-    description: 'Receive a curated list of accredited universities matched to your career goals.',
-    icon: GraduationCap,
-  },
-  {
-    step: '03',
-    title: 'Applications & Scholarships',
-    description: 'Submit error-free applications, SOP reviews, and merit scholarship nominations.',
-    icon: FileCheck2,
-  },
-  {
-    step: '04',
-    title: 'Visa & Departure',
-    description: 'Complete financial documentation, mock visa interviews, and pre-departure briefing.',
-    icon: PlaneTakeoff,
-  },
 ];
 
 export default function HomePage() {
@@ -296,43 +266,8 @@ export default function HomePage() {
       {/* Dual-Row Infinite Partner Universities Marquee */}
       <UniversitiesMarqueeSection universities={universitiesRes?.data ?? []} />
 
-      {/* How It Works — 4-Step Admission Process */}
-      <section className="border-y border-zinc-200 bg-white py-16">
-        <div className="mx-auto max-w-11/12 space-y-10 px-4 sm:px-6">
-          <div className="max-w-2xl space-y-2">
-            <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
-              How It Works
-            </div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">
-              4 Steps From Consultation to Campus
-            </h2>
-            <p className="text-sm text-zinc-700">
-              A structured, transparent admissions workflow backed by real-time status tracking.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {ADMISSION_STEPS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.step}
-                  className="rounded-xl bg-[#F8FAFC] p-6 ring-1 ring-zinc-950/10 space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-50 text-teal-700 ring-1 ring-teal-200">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <span className="font-mono text-xs font-bold text-zinc-500">{item.step}</span>
-                  </div>
-                  <h3 className="font-display text-base font-bold text-zinc-950">{item.title}</h3>
-                  <p className="text-xs leading-relaxed text-zinc-700">{item.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* 6-Step Ascending Curved Path — How It Works */}
+      <HowItWorksSection />
 
       {/* Success Stories Carousel (Embla) */}
       {stories.length > 0 && (
