@@ -236,8 +236,8 @@ export default function AdminLayout() {
                           className={({ isActive }) =>
                             `group flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-all ${
                               isActive
-                                ? 'bg-white text-zinc-950 font-semibold shadow-sm'
-                                : 'text-white/90 font-medium hover:bg-white/10 hover:text-white'
+                                ? 'bg-white/20 text-white font-semibold ring-1 ring-white/30 shadow-xs backdrop-blur-xs'
+                                : 'text-white/85 font-medium hover:bg-white/10 hover:text-white'
                             }`
                           }
                         >
@@ -246,11 +246,11 @@ export default function AdminLayout() {
                               <span className="flex items-center gap-3 min-w-0">
                                 <Icon
                                   className={`h-4 w-4 shrink-0 ${
-                                    isActive ? 'text-zinc-950' : 'text-white'
+                                    isActive ? 'text-white' : 'text-white/85 group-hover:text-white'
                                   }`}
                                 />
                                 {!isCollapsed && (
-                                  <span className={`truncate ${isActive ? 'text-zinc-950' : 'text-white/90 group-hover:text-white'}`}>
+                                  <span className="truncate text-white">
                                     {item.label}
                                   </span>
                                 )}
@@ -259,7 +259,7 @@ export default function AdminLayout() {
                                 <span
                                   className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
                                     isActive
-                                      ? 'bg-teal-600 text-white'
+                                      ? 'bg-white/30 text-white'
                                       : 'bg-white/20 text-white'
                                   }`}
                                 >
