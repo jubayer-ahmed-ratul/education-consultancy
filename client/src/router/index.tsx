@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RouteErrorBoundary } from '../components/RouteErrorBoundary';
 import PublicLayout from '../layouts/PublicLayout';
+import { adminChunkLoaders } from '../lib/adminChunks';
 import { lazyWithRetry } from '../lib/lazyWithRetry';
 import AboutPage from '../pages/public/AboutPage';
 import ApplyPage from '../pages/public/ApplyPage';
@@ -20,20 +21,20 @@ import UniversitiesPage from '../pages/public/UniversitiesPage';
 import UniversityDetailPage from '../pages/public/UniversityDetailPage';
 import { PermissionGuard, ProtectedRoute } from './guards';
 
-const AdminLayout = lazyWithRetry(() => import('../layouts/AdminLayout'));
-const LoginPage = lazyWithRetry(() => import('../pages/admin/LoginPage'));
-const DashboardPage = lazyWithRetry(() => import('../pages/admin/DashboardPage'));
-const InquiriesListPage = lazyWithRetry(() => import('../pages/admin/InquiriesListPage'));
-const InquiryDetailPage = lazyWithRetry(() => import('../pages/admin/InquiryDetailPage'));
-const CountriesPage = lazyWithRetry(() => import('../pages/admin/CountriesPage'));
-const UniversitiesAdminPage = lazyWithRetry(() => import('../pages/admin/UniversitiesPage'));
-const UsersPage = lazyWithRetry(() => import('../pages/admin/UsersPage'));
-const ActivityLogsPage = lazyWithRetry(() => import('../pages/admin/ActivityLogsPage'));
-const CmsCollectionsPage = lazyWithRetry(() => import('../pages/admin/CmsCollectionsPage'));
-const CmsSettingsPage = lazyWithRetry(() => import('../pages/admin/CmsSettingsPage'));
+const AdminLayout = lazyWithRetry(adminChunkLoaders.layout);
+const LoginPage = lazyWithRetry(adminChunkLoaders.login);
+const DashboardPage = lazyWithRetry(adminChunkLoaders.dashboard);
+const InquiriesListPage = lazyWithRetry(adminChunkLoaders.inquiries);
+const InquiryDetailPage = lazyWithRetry(adminChunkLoaders.inquiryDetail);
+const CountriesPage = lazyWithRetry(adminChunkLoaders.countries);
+const UniversitiesAdminPage = lazyWithRetry(adminChunkLoaders.universities);
+const UsersPage = lazyWithRetry(adminChunkLoaders.users);
+const ActivityLogsPage = lazyWithRetry(adminChunkLoaders.activityLogs);
+const CmsCollectionsPage = lazyWithRetry(adminChunkLoaders.cmsCollections);
+const CmsSettingsPage = lazyWithRetry(adminChunkLoaders.cmsSettings);
 
 function LazyFallback() {
-  return <div className="p-6 text-sm text-zinc-600">Loading module...</div>;
+  return <div className="p-6 text-sm text-zinc-600">Loading workspace...</div>;
 }
 
 export const router = createBrowserRouter([
@@ -79,12 +80,13 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Suspense fallback={<LazyFallback />}><DashboardPage /></Suspense> },
+      { index: true, element: <DashboardPage /> },
+      { path: 'dashboard', element: <DashboardPage /> },
       {
         path: 'inquiries',
         element: (
           <PermissionGuard permission="inquiries:view-all">
-            <Suspense fallback={<LazyFallback />}><InquiriesListPage /></Suspense>
+            <InquiriesListPage />
           </PermissionGuard>
         ),
       },
@@ -92,7 +94,7 @@ export const router = createBrowserRouter([
         path: 'inquiries/:id',
         element: (
           <PermissionGuard permission="inquiries:view-all">
-            <Suspense fallback={<LazyFallback />}><InquiryDetailPage /></Suspense>
+            <InquiryDetailPage />
           </PermissionGuard>
         ),
       },
@@ -100,7 +102,7 @@ export const router = createBrowserRouter([
         path: 'countries',
         element: (
           <PermissionGuard permission="countries:manage">
-            <Suspense fallback={<LazyFallback />}><CountriesPage /></Suspense>
+            <CountriesPage />
           </PermissionGuard>
         ),
       },
@@ -108,7 +110,7 @@ export const router = createBrowserRouter([
         path: 'universities',
         element: (
           <PermissionGuard permission="universities:manage">
-            <Suspense fallback={<LazyFallback />}><UniversitiesAdminPage /></Suspense>
+            <UniversitiesAdminPage />
           </PermissionGuard>
         ),
       },
@@ -116,7 +118,7 @@ export const router = createBrowserRouter([
         path: 'users',
         element: (
           <PermissionGuard permission="users:manage">
-            <Suspense fallback={<LazyFallback />}><UsersPage /></Suspense>
+            <UsersPage />
           </PermissionGuard>
         ),
       },
@@ -124,7 +126,7 @@ export const router = createBrowserRouter([
         path: 'activity-logs',
         element: (
           <PermissionGuard permission="activity-log:view">
-            <Suspense fallback={<LazyFallback />}><ActivityLogsPage /></Suspense>
+            <ActivityLogsPage />
           </PermissionGuard>
         ),
       },
@@ -132,7 +134,7 @@ export const router = createBrowserRouter([
         path: 'cms/blogs',
         element: (
           <PermissionGuard permission="content:manage">
-            <Suspense fallback={<LazyFallback />}><CmsCollectionsPage kind="blogs" /></Suspense>
+            <CmsCollectionsPage kind="blogs" />
           </PermissionGuard>
         ),
       },
@@ -140,7 +142,7 @@ export const router = createBrowserRouter([
         path: 'cms/events',
         element: (
           <PermissionGuard permission="content:manage">
-            <Suspense fallback={<LazyFallback />}><CmsCollectionsPage kind="events" /></Suspense>
+            <CmsCollectionsPage kind="events" />
           </PermissionGuard>
         ),
       },
@@ -148,7 +150,7 @@ export const router = createBrowserRouter([
         path: 'cms/success-stories',
         element: (
           <PermissionGuard permission="content:manage">
-            <Suspense fallback={<LazyFallback />}><CmsCollectionsPage kind="success-stories" /></Suspense>
+            <CmsCollectionsPage kind="success-stories" />
           </PermissionGuard>
         ),
       },
@@ -156,7 +158,7 @@ export const router = createBrowserRouter([
         path: 'cms/gallery',
         element: (
           <PermissionGuard permission="content:manage">
-            <Suspense fallback={<LazyFallback />}><CmsCollectionsPage kind="gallery" /></Suspense>
+            <CmsCollectionsPage kind="gallery" />
           </PermissionGuard>
         ),
       },
@@ -164,7 +166,7 @@ export const router = createBrowserRouter([
         path: 'cms/sister-concerns',
         element: (
           <PermissionGuard permission="content:manage">
-            <Suspense fallback={<LazyFallback />}><CmsCollectionsPage kind="sister-concerns" /></Suspense>
+            <CmsCollectionsPage kind="sister-concerns" />
           </PermissionGuard>
         ),
       },
@@ -172,11 +174,11 @@ export const router = createBrowserRouter([
         path: 'cms/settings',
         element: (
           <PermissionGuard permission="content:manage">
-            <Suspense fallback={<LazyFallback />}><CmsSettingsPage /></Suspense>
+            <CmsSettingsPage />
           </PermissionGuard>
         ),
       },
-      { path: '*', element: <Navigate to="/admin" replace /> },
     ],
   },
+  { path: '*', element: <Navigate to="/" replace /> },
 ]);

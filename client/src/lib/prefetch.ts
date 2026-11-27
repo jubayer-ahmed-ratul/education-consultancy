@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
+import { preloadAdminChunk } from './adminChunks';
 import { apiRequest } from './api-client';
 import { queryKeys } from './query-keys';
 
@@ -123,6 +124,7 @@ export function prefetchRoute(queryClient: QueryClient, to: string) {
 }
 
 export function prefetchAdminRoute(queryClient: QueryClient, to: string) {
+  preloadAdminChunk(to);
   const task = (() => {
     if (to === '/admin/inquiries') {
       return queryClient.prefetchQuery({

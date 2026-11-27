@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -42,6 +42,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../components/ui/s
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { preloadAllAdminChunks } from '../lib/adminChunks';
 import { apiRequest } from '../lib/api-client';
 import { prefetchAdminRoute } from '../lib/prefetch';
 import { queryKeys } from '../lib/query-keys';
@@ -164,6 +165,24 @@ export default function AdminLayout() {
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  // Eagerly preload all admin route JS chunks after initial shell mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(() => preloadAllAdminChunks());
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(() => preloadAllAdminChunks(), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Keep Render backend warm while an admin session is active (every 10 minutes)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      void apiRequest('/health').catch(() => undefined);
+    }, 10 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   async function handleLogout() {
@@ -410,7 +429,21 @@ export default function AdminLayout() {
           </header>
 
           <main className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8">
-            <Outlet />
+            <Suspense
+              fallback={
+                <div className="min-h-[400px] space-y-5">
+                  <div className="h-8 w-52 animate-pulse rounded-xl bg-zinc-200/80" />
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-28 animate-pulse rounded-2xl bg-white ring-1 ring-zinc-200/70" />
+                    ))}
+                  </div>
+                  <div className="h-64 animate-pulse rounded-2xl bg-white ring-1 ring-zinc-200/70" />
+                </div>
+              }
+            >
+              <Outlet />
+            </Suspense>
           </main>
         </div>
 

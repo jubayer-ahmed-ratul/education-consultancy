@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { startTransition, useMemo, useState } from 'react';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ColumnDef } from '@tanstack/react-table';
 import { ChevronRight, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -59,6 +59,7 @@ export default function InquiriesListPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.inquiries.list({ page, limit, search, status, sort }),
+    placeholderData: keepPreviousData,
     queryFn: () => apiRequest<InquiryRow[]>(`/inquiries?${queryParams.toString()}`),
   });
 
@@ -198,8 +199,10 @@ export default function InquiriesListPage() {
               key={tab.value || 'all'}
               type="button"
               onClick={() => {
-                setStatus(tab.value);
-                setPage(1);
+                startTransition(() => {
+                  setStatus(tab.value);
+                  setPage(1);
+                });
               }}
               className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
                 active
