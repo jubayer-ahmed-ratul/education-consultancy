@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { ArrowUpRight, Compass, Menu, MessageCircle, Search } from 'lucide-react';
+import { Compass, Menu, MessageCircle, Search } from 'lucide-react';
+import { Footer } from '../components/Footer';
 import { ScrollToTop } from '../components/ScrollToTop';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
@@ -62,8 +63,6 @@ export default function PublicLayout() {
   }
 
   const whatsapp = bundle?.whatsappSetting;
-  const footer = bundle?.footerSetting;
-  const sisterConcerns = bundle?.sisterConcerns ?? [];
 
   const waHref =
     whatsapp?.isEnabled && whatsapp.phoneNumber
@@ -230,127 +229,8 @@ export default function PublicLayout() {
         <Outlet />
       </main>
 
-      {/* High-Contrast Footer */}
-      <footer className="border-t border-zinc-800 bg-zinc-950 text-zinc-300">
-        <div className="mx-auto max-w-11/12 px-4 py-12 sm:px-6">
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="space-y-3 lg:col-span-2">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 text-white">
-                  <Compass className="h-4 w-4" />
-                </span>
-                <span className="font-display text-lg font-bold text-white">StudySphere</span>
-              </div>
-              <p className="max-w-md text-sm leading-relaxed text-zinc-300">
-                {bundle?.siteContent?.highlightTitle ||
-                  'Transparent admissions advisory, scholarship evaluation, and student visa guidance for global higher education.'}
-              </p>
-              <div className="pt-1">
-                <Link
-                  to="/admin/login"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-teal-400 hover:text-teal-300"
-                >
-                  Counselor &amp; Admin Portal <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-teal-400">
-                Featured Destinations
-              </div>
-              <ul className="space-y-2 text-sm text-zinc-300">
-                {(footer?.featuredCountrySlugs ?? []).map((slug) => (
-                  <li key={slug}>
-                    <Link
-                      to={`/destinations/${slug}`}
-                      onMouseEnter={handlePrefetch(`/destinations/${slug}`)}
-                      onFocus={handlePrefetch(`/destinations/${slug}`)}
-                      className="capitalize transition-colors hover:text-white"
-                    >
-                      {slug.replace(/-/g, ' ')}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-teal-400">
-                Quick Links
-              </div>
-              <ul className="space-y-2 text-sm text-zinc-300">
-                <li>
-                  <Link to="/apply" className="transition-colors hover:text-white">
-                    Book Free Consultation
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/track" className="transition-colors hover:text-white">
-                    Track &amp; Recover ID
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/success-stories"
-                    onMouseEnter={handlePrefetch('/success-stories')}
-                    className="transition-colors hover:text-white"
-                  >
-                    Student Success Stories
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/about"
-                    onMouseEnter={handlePrefetch('/about')}
-                    className="transition-colors hover:text-white"
-                  >
-                    About StudySphere
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/contact"
-                    onMouseEnter={handlePrefetch('/contact')}
-                    className="transition-colors hover:text-white"
-                  >
-                    Contact &amp; Office Map
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {sisterConcerns.length > 0 && (
-            <div className="mt-10 border-t border-zinc-800 pt-6">
-              <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                Sister Concerns &amp; Partner Ventures
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {sisterConcerns.map((sc) => (
-                  <a
-                    key={sc.id}
-                    href={sc.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-200 transition-colors hover:border-zinc-700 hover:bg-zinc-800"
-                  >
-                    <span>{sc.name}</span>
-                    <ArrowUpRight className="h-3 w-3 text-teal-400" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-zinc-800 pt-6 text-xs text-zinc-400">
-            <span>© {new Date().getFullYear()} StudySphere. All rights reserved.</span>
-            <span>
-              Reference Prefix: <code className="text-zinc-200">ZRC-YYYY-XXX</code>
-            </span>
-          </div>
-        </div>
-      </footer>
+      {/* Modern StudySphere Footer */}
+      <Footer bundle={bundle} waHref={waHref} />
 
       {/* Floating WhatsApp Support Pill */}
       {waHref && (

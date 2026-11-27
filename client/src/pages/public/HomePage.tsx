@@ -3,8 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  BookOpen,
-  Calendar,
   Globe2,
   Search,
 } from 'lucide-react';
@@ -12,6 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AboutPreviewSection } from '../../components/AboutPreviewSection';
 import { AnimatedNumber } from '../../components/AnimatedNumber';
+import { FaqSection } from '../../components/FaqSection';
 import { HowItWorksSection } from '../../components/HowItWorksSection';
 import { ServicesSection } from '../../components/ServicesSection';
 import { SuccessStoriesSection } from '../../components/SuccessStoriesSection';
@@ -19,7 +18,7 @@ import { UniversitiesMarqueeSection } from '../../components/UniversitiesMarquee
 import { Button } from '../../components/ui/button';
 import { usePublicBundle } from '../../hooks/usePublicBundle';
 import { apiRequest } from '../../lib/api-client';
-import { prefetchBlog, prefetchCountriesList, prefetchDestination, prefetchEvent } from '../../lib/prefetch';
+import { prefetchCountriesList, prefetchDestination } from '../../lib/prefetch';
 import { queryKeys } from '../../lib/query-keys';
 
 const FALLBACK_DESTINATION_IMAGES = [
@@ -58,22 +57,6 @@ export default function HomePage() {
           country?: { name: string; slug?: string };
         }>
       >('/universities?page=1&limit=24'),
-  });
-
-  const { data: blogsRes } = useQuery({
-    queryKey: ['public-blogs', 1],
-    queryFn: () =>
-      apiRequest<Array<{ id: string; title: string; slug: string; excerpt: string; category: string; author: string }>>(
-        '/blogs?page=1&limit=3'
-      ),
-  });
-
-  const { data: eventsRes } = useQuery({
-    queryKey: ['public-events', 'upcoming'],
-    queryFn: () =>
-      apiRequest<Array<{ id: string; title: string; slug: string; shortDescription: string; eventDate: string; venue: string }>>(
-        '/events?filter=upcoming'
-      ),
   });
 
   const hero = bundle?.heroContent;
@@ -264,66 +247,8 @@ export default function HomePage() {
       {/* 6-Card Center-Focus Peek Carousel — Success Stories */}
       <SuccessStoriesSection stories={stories} />
 
-      {/* Latest Blogs & Upcoming Events */}
-      <section className="mx-auto grid max-w-11/12 grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
-            <h2 className="flex items-center gap-2 font-display text-xl font-bold text-zinc-950">
-              <BookOpen className="h-4.5 w-4.5 text-teal-600" /> Study Guides &amp; Blogs
-            </h2>
-            <Link to="/blogs" className="text-xs font-semibold text-teal-700 hover:underline">
-              All Blogs
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {blogsRes?.data.map((b) => (
-              <Link
-                key={b.id}
-                to={`/blogs/${b.slug}`}
-                onMouseEnter={() => void prefetchBlog(queryClient, b.slug)}
-                onTouchStart={() => void prefetchBlog(queryClient, b.slug)}
-                onFocus={() => void prefetchBlog(queryClient, b.slug)}
-                className="block rounded-xl bg-white p-4 ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40"
-              >
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-teal-700">
-                  {b.category}
-                </div>
-                <div className="mt-1 font-display font-bold text-zinc-950">{b.title}</div>
-                <p className="mt-1 text-xs text-zinc-700 line-clamp-2">{b.excerpt}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
-            <h2 className="flex items-center gap-2 font-display text-xl font-bold text-zinc-950">
-              <Calendar className="h-4.5 w-4.5 text-teal-600" /> Upcoming Events
-            </h2>
-            <Link to="/events" className="text-xs font-semibold text-teal-700 hover:underline">
-              All Events
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {eventsRes?.data.slice(0, 3).map((ev) => (
-              <Link
-                key={ev.id}
-                to={`/events/${ev.slug}`}
-                onMouseEnter={() => void prefetchEvent(queryClient, ev.slug)}
-                onTouchStart={() => void prefetchEvent(queryClient, ev.slug)}
-                onFocus={() => void prefetchEvent(queryClient, ev.slug)}
-                className="block rounded-xl bg-white p-4 ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40"
-              >
-                <div className="font-mono text-[11px] font-semibold text-teal-700">
-                  {new Date(ev.eventDate).toLocaleDateString()} • {ev.venue}
-                </div>
-                <div className="mt-1 font-display font-bold text-zinc-950">{ev.title}</div>
-                <p className="mt-1 text-xs text-zinc-700 line-clamp-2">{ev.shortDescription}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Frequently Asked Questions */}
+      <FaqSection />
 
       {/* Conversion Banner */}
       <section className="mx-auto max-w-11/12 px-4 sm:px-6">
