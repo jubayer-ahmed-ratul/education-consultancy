@@ -27,7 +27,7 @@
       "destination": "https://education-consultancy-ufew.onrender.com/api/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|api/).*)",
       "destination": "/index.html"
     }
   ]
