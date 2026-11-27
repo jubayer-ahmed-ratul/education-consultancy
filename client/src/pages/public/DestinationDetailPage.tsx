@@ -33,7 +33,7 @@ export default function DestinationDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-4xl space-y-4 px-4 py-10">
+      <div className="mx-auto max-w-11/12 space-y-4 px-4 py-10">
         <div className="h-8 w-48 animate-pulse rounded bg-zinc-200/70" />
         <div className="h-44 animate-pulse rounded-xl bg-zinc-200/70" />
       </div>
@@ -42,7 +42,7 @@ export default function DestinationDetailPage() {
 
   if (error || !data?.data) {
     return (
-      <div className="mx-auto max-w-4xl space-y-3 px-4 py-12 text-center">
+      <div className="mx-auto max-w-11/12 space-y-3 px-4 py-12 text-center">
         <p className="text-sm font-medium text-rose-700">Destination not found.</p>
         <Link to="/destinations" className="text-sm font-semibold text-teal-700 underline">
           Back to Destinations
@@ -61,7 +61,7 @@ export default function DestinationDetailPage() {
   ] as const;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
         <title>Study in {c.name} — Zero Compile</title>
         <meta name="description" content={c.description.slice(0, 155)} />

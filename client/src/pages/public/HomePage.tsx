@@ -133,7 +133,7 @@ export default function HomePage() {
 
       {/* Split Hero Section */}
       <section className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-11/12 px-4 py-14 sm:px-6 sm:py-20">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -248,7 +248,7 @@ export default function HomePage() {
 
       {/* Live Trust Stats Bar */}
       {bundle?.heroStats && bundle.heroStats.length > 0 && (
-        <section className="mx-auto -mt-12 max-w-7xl px-4 sm:px-6">
+        <section className="mx-auto -mt-12 max-w-11/12 px-4 sm:px-6">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {bundle.heroStats.map((stat) => (
               <div
@@ -267,7 +267,7 @@ export default function HomePage() {
       )}
 
       {/* Top Study Destinations */}
-      <section className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6">
+      <section className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
@@ -327,7 +327,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Universities (Filterable Grid) */}
-      <section className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6">
+      <section className="mx-auto max-w-11/12 space-y-6 px-4 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
@@ -409,7 +409,7 @@ export default function HomePage() {
 
       {/* How It Works — 4-Step Admission Process */}
       <section className="border-y border-zinc-200 bg-white py-16">
-        <div className="mx-auto max-w-7xl space-y-10 px-4 sm:px-6">
+        <div className="mx-auto max-w-11/12 space-y-10 px-4 sm:px-6">
           <div className="max-w-2xl space-y-2">
             <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
               How It Works
@@ -447,7 +447,7 @@ export default function HomePage() {
 
       {/* Success Stories Carousel (Embla) */}
       {stories.length > 0 && (
-        <section className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6">
+        <section className="mx-auto max-w-11/12 space-y-6 px-4 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
@@ -516,7 +516,7 @@ export default function HomePage() {
       )}
 
       {/* Latest Blogs & Upcoming Events */}
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2">
+      <section className="mx-auto grid max-w-11/12 grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2">
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
             <h2 className="flex items-center gap-2 font-display text-xl font-bold text-zinc-950">
@@ -577,7 +577,7 @@ export default function HomePage() {
       </section>
 
       {/* Conversion Banner */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6">
+      <section className="mx-auto max-w-11/12 px-4 sm:px-6">
         <div className="rounded-2xl bg-zinc-950 p-8 text-white ring-1 ring-zinc-900 sm:p-12">
           <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
             <div className="max-w-2xl space-y-3">
@@ -615,7 +615,7 @@ export default function HomePage() {
       </section>
 
       {isLoading && (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto max-w-11/12 px-4 sm:px-6">
           <div className="h-24 animate-pulse rounded-xl bg-zinc-200/70" />
         </div>
       )}

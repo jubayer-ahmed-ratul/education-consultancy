@@ -45,7 +45,7 @@ export default function PublicLayout() {
 
       {/* Sticky Glassmorphic Header */}
       <header className="sticky top-0 z-40 h-16 border-b border-zinc-200 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="mx-auto flex h-full max-w-11/12 items-center justify-between gap-4 px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5 group shrink-0">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-600 text-white shadow-xs transition-colors group-hover:bg-teal-700">
               <Compass className="h-4.5 w-4.5" />
@@ -153,7 +153,7 @@ export default function PublicLayout() {
 
       {/* High-Contrast Footer */}
       <footer className="border-t border-zinc-800 bg-zinc-950 text-zinc-300">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-11/12 px-4 py-12 sm:px-6">
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-3 lg:col-span-2">
               <div className="flex items-center gap-2.5">

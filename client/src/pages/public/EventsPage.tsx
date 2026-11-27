@@ -30,7 +30,7 @@ export default function EventsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
         <title>Events & Fairs — Zero Compile</title>
       </Helmet>

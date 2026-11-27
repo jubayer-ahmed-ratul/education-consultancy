@@ -33,7 +33,7 @@ export default function EventDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-3xl space-y-4 px-4 py-10">
+      <div className="mx-auto max-w-11/12 space-y-4 px-4 py-10">
         <div className="h-8 w-56 animate-pulse rounded bg-zinc-200/70" />
         <div className="h-52 animate-pulse rounded-xl bg-zinc-200/70" />
       </div>
@@ -42,7 +42,7 @@ export default function EventDetailPage() {
 
   if (error || !data?.data) {
     return (
-      <div className="mx-auto max-w-3xl space-y-3 px-4 py-12 text-center">
+      <div className="mx-auto max-w-11/12 space-y-3 px-4 py-12 text-center">
         <p className="text-sm font-medium text-rose-700">Event not found.</p>
         <Link to="/events" className="text-sm font-semibold text-teal-700 underline">
           Back to Events
@@ -53,7 +53,7 @@ export default function EventDetailPage() {
 
   const ev = data.data;
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-11/12 space-y-6 px-4 py-10 sm:px-6">
       <Helmet>
         <title>{ev.seoTitle || ev.title} — Zero Compile</title>
         <meta name="description" content={ev.seoDescription || ev.shortDescription} />
