@@ -20,6 +20,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AboutPreviewSection } from '../../components/AboutPreviewSection';
 import { AnimatedNumber } from '../../components/AnimatedNumber';
+import { ServicesSection } from '../../components/ServicesSection';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { usePublicBundle } from '../../hooks/usePublicBundle';
@@ -301,6 +302,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* 8 Core Study Abroad Services */}
+      <ServicesSection />
 
       {/* Featured Universities (Filterable Grid) */}
       <section className="mx-auto max-w-11/12 space-y-6 px-4 sm:px-6">
