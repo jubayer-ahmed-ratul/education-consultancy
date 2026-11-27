@@ -1,6 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { RouteErrorBoundary } from '../components/RouteErrorBoundary';
 import PublicLayout from '../layouts/PublicLayout';
+import { lazyWithRetry } from '../lib/lazyWithRetry';
 import AboutPage from '../pages/public/AboutPage';
 import ApplyPage from '../pages/public/ApplyPage';
 import BlogDetailPage from '../pages/public/BlogDetailPage';
@@ -18,26 +20,27 @@ import UniversitiesPage from '../pages/public/UniversitiesPage';
 import UniversityDetailPage from '../pages/public/UniversityDetailPage';
 import { PermissionGuard, ProtectedRoute } from './guards';
 
-const AdminLayout = lazy(() => import('../layouts/AdminLayout'));
-const LoginPage = lazy(() => import('../pages/admin/LoginPage'));
-const DashboardPage = lazy(() => import('../pages/admin/DashboardPage'));
-const InquiriesListPage = lazy(() => import('../pages/admin/InquiriesListPage'));
-const InquiryDetailPage = lazy(() => import('../pages/admin/InquiryDetailPage'));
-const CountriesPage = lazy(() => import('../pages/admin/CountriesPage'));
-const UniversitiesAdminPage = lazy(() => import('../pages/admin/UniversitiesPage'));
-const UsersPage = lazy(() => import('../pages/admin/UsersPage'));
-const ActivityLogsPage = lazy(() => import('../pages/admin/ActivityLogsPage'));
-const CmsCollectionsPage = lazy(() => import('../pages/admin/CmsCollectionsPage'));
-const CmsSettingsPage = lazy(() => import('../pages/admin/CmsSettingsPage'));
+const AdminLayout = lazyWithRetry(() => import('../layouts/AdminLayout'));
+const LoginPage = lazyWithRetry(() => import('../pages/admin/LoginPage'));
+const DashboardPage = lazyWithRetry(() => import('../pages/admin/DashboardPage'));
+const InquiriesListPage = lazyWithRetry(() => import('../pages/admin/InquiriesListPage'));
+const InquiryDetailPage = lazyWithRetry(() => import('../pages/admin/InquiryDetailPage'));
+const CountriesPage = lazyWithRetry(() => import('../pages/admin/CountriesPage'));
+const UniversitiesAdminPage = lazyWithRetry(() => import('../pages/admin/UniversitiesPage'));
+const UsersPage = lazyWithRetry(() => import('../pages/admin/UsersPage'));
+const ActivityLogsPage = lazyWithRetry(() => import('../pages/admin/ActivityLogsPage'));
+const CmsCollectionsPage = lazyWithRetry(() => import('../pages/admin/CmsCollectionsPage'));
+const CmsSettingsPage = lazyWithRetry(() => import('../pages/admin/CmsSettingsPage'));
 
 function LazyFallback() {
-  return <div className="p-6 text-sm text-slate-500">Loading module...</div>;
+  return <div className="p-6 text-sm text-zinc-600">Loading module...</div>;
 }
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <PublicLayout />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'destinations', element: <DestinationsPage /> },
@@ -58,6 +61,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin/login',
+    errorElement: <RouteErrorBoundary />,
     element: (
       <Suspense fallback={<LazyFallback />}>
         <LoginPage />
@@ -66,6 +70,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin',
+    errorElement: <RouteErrorBoundary />,
     element: (
       <ProtectedRoute>
         <Suspense fallback={<LazyFallback />}>

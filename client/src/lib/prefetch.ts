@@ -90,75 +90,85 @@ export function prefetchContactPage(queryClient: QueryClient) {
 }
 
 export function prefetchRoute(queryClient: QueryClient, to: string) {
-  if (to === '/destinations') return prefetchCountriesList(queryClient);
-  if (to.startsWith('/destinations/')) {
-    const slug = to.slice('/destinations/'.length);
-    if (slug) return prefetchDestination(queryClient, slug);
-  }
-  if (to === '/universities') return prefetchUniversitiesList(queryClient);
-  if (to.startsWith('/universities/')) {
-    const slug = to.slice('/universities/'.length);
-    if (slug) return prefetchUniversity(queryClient, slug);
-  }
-  if (to === '/blogs') return prefetchBlogsList(queryClient);
-  if (to.startsWith('/blogs/')) {
-    const slug = to.slice('/blogs/'.length);
-    if (slug) return prefetchBlog(queryClient, slug);
-  }
-  if (to === '/events') return prefetchEventsList(queryClient, 'all');
-  if (to.startsWith('/events/')) {
-    const slug = to.slice('/events/'.length);
-    if (slug) return prefetchEvent(queryClient, slug);
-  }
-  if (to === '/about') return prefetchAboutPage(queryClient);
-  if (to === '/contact') return prefetchContactPage(queryClient);
-  if (to === '/success-stories' || to === '/gallery' || to === '/') {
-    return prefetchPublicBundle(queryClient);
-  }
+  const task = (() => {
+    if (to === '/destinations') return prefetchCountriesList(queryClient);
+    if (to.startsWith('/destinations/')) {
+      const slug = to.slice('/destinations/'.length);
+      if (slug) return prefetchDestination(queryClient, slug);
+    }
+    if (to === '/universities') return prefetchUniversitiesList(queryClient);
+    if (to.startsWith('/universities/')) {
+      const slug = to.slice('/universities/'.length);
+      if (slug) return prefetchUniversity(queryClient, slug);
+    }
+    if (to === '/blogs') return prefetchBlogsList(queryClient);
+    if (to.startsWith('/blogs/')) {
+      const slug = to.slice('/blogs/'.length);
+      if (slug) return prefetchBlog(queryClient, slug);
+    }
+    if (to === '/events') return prefetchEventsList(queryClient, 'all');
+    if (to.startsWith('/events/')) {
+      const slug = to.slice('/events/'.length);
+      if (slug) return prefetchEvent(queryClient, slug);
+    }
+    if (to === '/about') return prefetchAboutPage(queryClient);
+    if (to === '/contact') return prefetchContactPage(queryClient);
+    if (to === '/success-stories' || to === '/gallery' || to === '/') {
+      return prefetchPublicBundle(queryClient);
+    }
+    return undefined;
+  })();
+
+  return task?.catch(() => undefined);
 }
 
 export function prefetchAdminRoute(queryClient: QueryClient, to: string) {
-  if (to === '/admin/inquiries') {
-    return queryClient.prefetchQuery({
-      queryKey: queryKeys.inquiries.list({ page: 1, search: '', status: '', sort: 'newest' }),
-      queryFn: () => apiRequest('/inquiries?page=1&limit=20&sort=newest'),
-    });
-  }
-  if (to === '/admin/countries') {
-    return queryClient.prefetchQuery({
-      queryKey: queryKeys.countries.adminList({ page: 1, limit: 100 }),
-      queryFn: () => apiRequest('/countries/admin/list?page=1&limit=100'),
-    });
-  }
-  if (to === '/admin/universities') {
-    return queryClient.prefetchQuery({
-      queryKey: queryKeys.universities.adminList({ page: 1, limit: 100 }),
-      queryFn: () => apiRequest('/universities/admin/list?page=1&limit=100'),
-    });
-  }
-  if (to === '/admin/users') {
-    return queryClient.prefetchQuery({
-      queryKey: queryKeys.users.list({ page: 1 }),
-      queryFn: () => apiRequest('/users?page=1&limit=50'),
-    });
-  }
-  if (to === '/admin/activity-logs') {
-    return queryClient.prefetchQuery({
-      queryKey: queryKeys.activityLogs.list({ page: 1, entityType: '', action: '' }),
-      queryFn: () => apiRequest('/activity-logs?page=1&limit=25'),
-    });
-  }
-  if (to.startsWith('/admin/cms/')) {
-    const kind = to.slice('/admin/cms/'.length);
-    if (kind === 'settings') {
+  const task = (() => {
+    if (to === '/admin/inquiries') {
       return queryClient.prefetchQuery({
-        queryKey: queryKeys.cms.section('singleton:hero-content'),
-        queryFn: () => apiRequest('/admin/content/hero-content'),
+        queryKey: queryKeys.inquiries.list({ page: 1, search: '', status: '', sort: 'newest' }),
+        queryFn: () => apiRequest('/inquiries?page=1&limit=20&sort=newest'),
       });
     }
-    return queryClient.prefetchQuery({
-      queryKey: queryKeys.cms.section(kind),
-      queryFn: () => apiRequest(`/admin/content/${kind}`),
-    });
-  }
+    if (to === '/admin/countries') {
+      return queryClient.prefetchQuery({
+        queryKey: queryKeys.countries.adminList({ page: 1, limit: 100 }),
+        queryFn: () => apiRequest('/countries/admin/list?page=1&limit=100'),
+      });
+    }
+    if (to === '/admin/universities') {
+      return queryClient.prefetchQuery({
+        queryKey: queryKeys.universities.adminList({ page: 1, limit: 100 }),
+        queryFn: () => apiRequest('/universities/admin/list?page=1&limit=100'),
+      });
+    }
+    if (to === '/admin/users') {
+      return queryClient.prefetchQuery({
+        queryKey: queryKeys.users.list({ page: 1 }),
+        queryFn: () => apiRequest('/users?page=1&limit=50'),
+      });
+    }
+    if (to === '/admin/activity-logs') {
+      return queryClient.prefetchQuery({
+        queryKey: queryKeys.activityLogs.list({ page: 1, entityType: '', action: '' }),
+        queryFn: () => apiRequest('/activity-logs?page=1&limit=25'),
+      });
+    }
+    if (to.startsWith('/admin/cms/')) {
+      const kind = to.slice('/admin/cms/'.length);
+      if (kind === 'settings') {
+        return queryClient.prefetchQuery({
+          queryKey: queryKeys.cms.section('singleton:hero-content'),
+          queryFn: () => apiRequest('/admin/content/hero-content'),
+        });
+      }
+      return queryClient.prefetchQuery({
+        queryKey: queryKeys.cms.section(kind),
+        queryFn: () => apiRequest(`/admin/content/${kind}`),
+      });
+    }
+    return undefined;
+  })();
+
+  return task?.catch(() => undefined);
 }
