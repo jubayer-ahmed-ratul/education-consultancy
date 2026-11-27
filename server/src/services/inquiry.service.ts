@@ -11,6 +11,7 @@ import {
 } from '@zero-compile/shared';
 import { prisma } from '../config/prisma';
 import { AppError } from '../utils/AppError';
+import { responseCache } from '../utils/cache';
 import { toDtoInquiryStatus, toPrismaInquiryStatus } from '../utils/inquiry-mapper';
 import { activityLogService } from './activity-log.service';
 import { counterService } from './counter.service';
@@ -117,6 +118,8 @@ export const inquiryService = {
       )
       .catch((err) => console.error('[InquiryService] Confirmation email failed:', err));
 
+    responseCache.invalidatePrefix('admin:inquiries:');
+
     return {
       referenceNumber: created.referenceNumber,
       status: toDtoInquiryStatus(created.status),
@@ -127,63 +130,75 @@ export const inquiryService = {
   },
 
   async list(query: InquiryListQuery): Promise<{ inquiries: unknown[]; meta: PaginationMeta }> {
-    const where: Prisma.InquiryWhereInput = {};
+    const cacheKey = `admin:inquiries:list:${JSON.stringify(query)}`;
+    return responseCache.getOrSet(cacheKey, 20_000, async () => {
+      const where: Prisma.InquiryWhereInput = {};
 
-    if (query.status) {
-      where.status = toPrismaInquiryStatus(query.status);
-    } else {
-      // CLONE_SPEC 3.3: Automatically excludes status: 'closed' unless explicitly requested
-      where.status = { not: InquiryStatus.closed };
-    }
+      if (query.status) {
+        where.status = toPrismaInquiryStatus(query.status);
+      } else {
+        // CLONE_SPEC 3.3: Automatically excludes status: 'closed' unless explicitly requested
+        where.status = { not: InquiryStatus.closed };
+      }
 
-    if (query.priority) where.priority = query.priority;
-    if (query.category) where.category = query.category;
-    if (query.assignedTo) where.assignedToId = query.assignedTo;
-    if (query.preferredCountry) where.preferredCountryId = query.preferredCountry;
-    if (query.preferredUniversity) where.preferredUniversityId = query.preferredUniversity;
+      if (query.priority) where.priority = query.priority;
+      if (query.category) where.category = query.category;
+      if (query.assignedTo) where.assignedToId = query.assignedTo;
+      if (query.preferredCountry) where.preferredCountryId = query.preferredCountry;
+      if (query.preferredUniversity) where.preferredUniversityId = query.preferredUniversity;
 
-    if (query.search) {
-      where.OR = [
-        { referenceNumber: { contains: query.search, mode: 'insensitive' } },
-        { studentFirstName: { contains: query.search, mode: 'insensitive' } },
-        { studentLastName: { contains: query.search, mode: 'insensitive' } },
-        { studentEmail: { contains: query.search, mode: 'insensitive' } },
-      ];
-    }
+      if (query.search) {
+        where.OR = [
+          { referenceNumber: { contains: query.search, mode: 'insensitive' } },
+          { studentFirstName: { contains: query.search, mode: 'insensitive' } },
+          { studentLastName: { contains: query.search, mode: 'insensitive' } },
+          { studentEmail: { contains: query.search, mode: 'insensitive' } },
+        ];
+      }
 
-    let orderBy: Prisma.InquiryOrderByWithRelationInput = { createdAt: 'desc' };
-    if (query.sort === 'oldest') orderBy = { createdAt: 'asc' };
-    else if (query.sort === 'priority_desc') orderBy = { priority: 'desc' };
-    else if (query.sort === 'priority_asc') orderBy = { priority: 'asc' };
+      let orderBy: Prisma.InquiryOrderByWithRelationInput = { createdAt: 'desc' };
+      if (query.sort === 'oldest') orderBy = { createdAt: 'asc' };
+      else if (query.sort === 'priority_desc') orderBy = { priority: 'desc' };
+      else if (query.sort === 'priority_asc') orderBy = { priority: 'asc' };
 
-    const skip = (query.page - 1) * query.limit;
-    const [rows, total] = await Promise.all([
-      prisma.inquiry.findMany({
-        where,
-        orderBy,
-        skip,
-        take: query.limit,
-        include: {
-          preferredCountry: { select: { id: true, name: true, slug: true } },
-          preferredUniversity: { select: { id: true, name: true, slug: true } },
-          assignedTo: { select: { id: true, name: true, email: true } },
+      const skip = (query.page - 1) * query.limit;
+      const [rows, total] = await Promise.all([
+        prisma.inquiry.findMany({
+          where,
+          orderBy,
+          skip,
+          take: query.limit,
+          select: {
+            id: true,
+            referenceNumber: true,
+            studentFirstName: true,
+            studentLastName: true,
+            studentEmail: true,
+            category: true,
+            priority: true,
+            status: true,
+            createdAt: true,
+            preferredCountry: { select: { id: true, name: true, slug: true } },
+            preferredUniversity: { select: { id: true, name: true, slug: true } },
+            assignedTo: { select: { id: true, name: true, email: true } },
+          },
+        }),
+        prisma.inquiry.count({ where }),
+      ]);
+
+      return {
+        inquiries: rows.map((row) => ({
+          ...row,
+          status: toDtoInquiryStatus(row.status),
+        })),
+        meta: {
+          page: query.page,
+          limit: query.limit,
+          total,
+          totalPages: Math.max(1, Math.ceil(total / query.limit)),
         },
-      }),
-      prisma.inquiry.count({ where }),
-    ]);
-
-    return {
-      inquiries: rows.map((row) => ({
-        ...row,
-        status: toDtoInquiryStatus(row.status),
-      })),
-      meta: {
-        page: query.page,
-        limit: query.limit,
-        total,
-        totalPages: Math.max(1, Math.ceil(total / query.limit)),
-      },
-    };
+      };
+    });
   },
 
   async getById(id: string) {
@@ -283,6 +298,8 @@ export const inquiryService = {
     emailService
       .sendStatusUpdate(existing.studentEmail, existing.referenceNumber, INQUIRY_STATUS_META[targetStatus].label)
       .catch((err) => console.error('[InquiryService] Status email failed:', err));
+
+    responseCache.invalidatePrefix('admin:inquiries:');
 
     return { id, status: targetStatus, previousStatus: fromStatus };
   },
@@ -391,6 +408,8 @@ export const inquiryService = {
       },
       ipAddress,
     });
+
+    responseCache.invalidatePrefix('admin:inquiries:');
 
     return {
       ...updated,

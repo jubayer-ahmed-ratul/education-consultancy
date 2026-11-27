@@ -59,7 +59,7 @@ const auditQuery = paginationQuerySchema.extend({
 
 // 1. Countries Admin Routes (/api/countries)
 const countryAdminRouter = Router();
-countryAdminRouter.use(invalidateCacheOnWrite('public:countries:', 'public:universities:'));
+countryAdminRouter.use(invalidateCacheOnWrite('public:countries:', 'public:universities:', 'admin:countries:'));
 countryAdminRouter.get('/admin/list', requireAuth, requirePermission('countries:manage'), validateQuery(paginationQuerySchema), cmsController.listAllCountries);
 countryAdminRouter.put('/reorder', requireAuth, requirePermission('countries:manage'), validateBody(reorderCountriesSchema), cmsController.reorderCountries);
 countryAdminRouter.post('/', requireAuth, requirePermission('countries:manage'), validateBody(createCountrySchema), cmsController.createCountry);
@@ -68,7 +68,7 @@ countryAdminRouter.delete('/:id', requireAuth, requirePermission('countries:mana
 
 // 2. Universities Admin Routes (/api/universities)
 const universityAdminRouter = Router();
-universityAdminRouter.use(invalidateCacheOnWrite('public:universities:', 'public:countries:'));
+universityAdminRouter.use(invalidateCacheOnWrite('public:universities:', 'public:countries:', 'admin:universities:'));
 universityAdminRouter.get('/admin/list', requireAuth, requirePermission('universities:manage'), validateQuery(universityListQuerySchema), cmsController.listAllUniversities);
 universityAdminRouter.post('/', requireAuth, requirePermission('universities:manage'), validateBody(createUniversitySchema), cmsController.createUniversity);
 universityAdminRouter.put('/:id', requireAuth, requirePermission('universities:manage'), validateParams(idParam), validateBody(updateUniversitySchema), cmsController.updateUniversity);
@@ -76,7 +76,7 @@ universityAdminRouter.delete('/:id', requireAuth, requirePermission('universitie
 
 // 3. CMS Content Admin Routes (/api/admin/content)
 const cmsContentRouter = Router();
-cmsContentRouter.use(requireAuth, requirePermission('content:manage'), invalidateCacheOnWrite('public:cms:', 'public:blogs:', 'public:events:'));
+cmsContentRouter.use(requireAuth, requirePermission('content:manage'), invalidateCacheOnWrite('public:cms:', 'public:blogs:', 'public:events:', 'admin:cms:'));
 
 cmsContentRouter.get('/about', cmsController.getSiteAbout);
 cmsContentRouter.put('/about', validateBody(siteContentAboutSchema), cmsController.upsertSiteAbout);

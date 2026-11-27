@@ -1,10 +1,11 @@
 import type { ApiErrorDetail, ApiResponse, PaginationMeta } from '@zero-compile/shared';
 
-const rawBaseUrl =
-  (import.meta.env.VITE_API_URL as string | undefined) ||
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) ||
-  '';
-const BASE_URL = rawBaseUrl.replace(/\/+$/, '');
+const rawBaseUrl = import.meta.env.PROD
+  ? ''
+  : (import.meta.env.VITE_API_URL as string | undefined) ||
+    (import.meta.env.VITE_API_BASE_URL as string | undefined) ||
+    '';
+const BASE_URL = rawBaseUrl.trim().replace(/\/+$/, '').replace(/\/api$/i, '');
 
 export class ApiClientError extends Error {
   public readonly status: number;
@@ -25,12 +26,9 @@ export interface ApiResult<T> {
   meta?: PaginationMeta;
 }
 
-export async function apiRequest<T>(
-  path: string,
-  options: RequestInit = {}
-): Promise<ApiResult<T>> {
-  const url = `${BASE_URL}/api${path.startsWith('/') ? path : `/${path}`}`;
+const inflightGets = new Map<string, Promise<ApiResult<unknown>>>();
 
+async function executeFetch<T>(url: string, options: RequestInit): Promise<ApiResult<T>> {
   const headers = new Headers(options.headers);
   if (options.body && !(options.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
@@ -58,4 +56,25 @@ export async function apiRequest<T>(
     data: json.data,
     meta: json.meta,
   };
+}
+
+export async function apiRequest<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<ApiResult<T>> {
+  const url = `${BASE_URL}/api${path.startsWith('/') ? path : `/${path}`}`;
+  const method = (options.method || 'GET').toUpperCase();
+
+  if (method === 'GET') {
+    const existing = inflightGets.get(url) as Promise<ApiResult<T>> | undefined;
+    if (existing) return existing;
+
+    const promise = executeFetch<T>(url, options).finally(() => {
+      inflightGets.delete(url);
+    });
+    inflightGets.set(url, promise as Promise<ApiResult<unknown>>);
+    return promise;
+  }
+
+  return executeFetch<T>(url, options);
 }

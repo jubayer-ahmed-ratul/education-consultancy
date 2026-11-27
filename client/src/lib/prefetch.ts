@@ -116,3 +116,49 @@ export function prefetchRoute(queryClient: QueryClient, to: string) {
     return prefetchPublicBundle(queryClient);
   }
 }
+
+export function prefetchAdminRoute(queryClient: QueryClient, to: string) {
+  if (to === '/admin/inquiries') {
+    return queryClient.prefetchQuery({
+      queryKey: queryKeys.inquiries.list({ page: 1, search: '', status: '', sort: 'newest' }),
+      queryFn: () => apiRequest('/inquiries?page=1&limit=20&sort=newest'),
+    });
+  }
+  if (to === '/admin/countries') {
+    return queryClient.prefetchQuery({
+      queryKey: queryKeys.countries.adminList({ page: 1, limit: 100 }),
+      queryFn: () => apiRequest('/countries/admin/list?page=1&limit=100'),
+    });
+  }
+  if (to === '/admin/universities') {
+    return queryClient.prefetchQuery({
+      queryKey: queryKeys.universities.adminList({ page: 1, limit: 100 }),
+      queryFn: () => apiRequest('/universities/admin/list?page=1&limit=100'),
+    });
+  }
+  if (to === '/admin/users') {
+    return queryClient.prefetchQuery({
+      queryKey: queryKeys.users.list({ page: 1 }),
+      queryFn: () => apiRequest('/users?page=1&limit=50'),
+    });
+  }
+  if (to === '/admin/activity-logs') {
+    return queryClient.prefetchQuery({
+      queryKey: queryKeys.activityLogs.list({ page: 1, entityType: '', action: '' }),
+      queryFn: () => apiRequest('/activity-logs?page=1&limit=25'),
+    });
+  }
+  if (to.startsWith('/admin/cms/')) {
+    const kind = to.slice('/admin/cms/'.length);
+    if (kind === 'settings') {
+      return queryClient.prefetchQuery({
+        queryKey: queryKeys.cms.section('singleton:hero-content'),
+        queryFn: () => apiRequest('/admin/content/hero-content'),
+      });
+    }
+    return queryClient.prefetchQuery({
+      queryKey: queryKeys.cms.section(kind),
+      queryFn: () => apiRequest(`/admin/content/${kind}`),
+    });
+  }
+}

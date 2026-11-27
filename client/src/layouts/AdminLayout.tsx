@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Activity,
@@ -32,6 +33,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../components/ui/s
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { prefetchAdminRoute } from '../lib/prefetch';
 
 interface NavItem {
   to: string;
@@ -100,6 +102,7 @@ function buildBreadcrumbs(pathname: string) {
 export default function AdminLayout() {
   const { user, logout, can } = useAuth();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -169,6 +172,8 @@ export default function AdminLayout() {
                     <NavLink
                       to={item.to}
                       end={item.end}
+                      onMouseEnter={() => void prefetchAdminRoute(queryClient, item.to)}
+                      onFocus={() => void prefetchAdminRoute(queryClient, item.to)}
                       onClick={() => setMobileOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-2.5 rounded-md px-2.5 py-2 text-xs font-medium transition-colors ${

@@ -9,25 +9,29 @@ import type {
 } from '@zero-compile/shared';
 import { prisma } from '../config/prisma';
 import { AppError } from '../utils/AppError';
+import { responseCache } from '../utils/cache';
 import { toSlug } from '../utils/slug';
 import { activityLogService } from './activity-log.service';
 
 export const cmsService = {
   // --- Countries ---
   async listAllCountries(query: { page: number; limit: number; search?: string }) {
-    const where: Prisma.CountryWhereInput = {};
-    if (query.search) {
-      where.OR = [
-        { name: { contains: query.search, mode: 'insensitive' } },
-        { slug: { contains: query.search, mode: 'insensitive' } },
-      ];
-    }
-    const skip = (query.page - 1) * query.limit;
-    const [items, total] = await Promise.all([
-      prisma.country.findMany({ where, orderBy: [{ order: 'asc' }, { createdAt: 'desc' }], skip, take: query.limit }),
-      prisma.country.count({ where }),
-    ]);
-    return { items, meta: { page: query.page, limit: query.limit, total, totalPages: Math.max(1, Math.ceil(total / query.limit)) } };
+    const cacheKey = `admin:countries:list:${query.page}:${query.limit}:${query.search ?? ''}`;
+    return responseCache.getOrSet(cacheKey, 30_000, async () => {
+      const where: Prisma.CountryWhereInput = {};
+      if (query.search) {
+        where.OR = [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          { slug: { contains: query.search, mode: 'insensitive' } },
+        ];
+      }
+      const skip = (query.page - 1) * query.limit;
+      const [items, total] = await Promise.all([
+        prisma.country.findMany({ where, orderBy: [{ order: 'asc' }, { createdAt: 'desc' }], skip, take: query.limit }),
+        prisma.country.count({ where }),
+      ]);
+      return { items, meta: { page: query.page, limit: query.limit, total, totalPages: Math.max(1, Math.ceil(total / query.limit)) } };
+    });
   },
 
   async createCountry(input: CreateCountryInput, actorId: string, ipAddress?: string | null) {
@@ -102,26 +106,29 @@ export const cmsService = {
 
   // --- Universities ---
   async listAllUniversities(query: { page: number; limit: number; country?: string; search?: string }) {
-    const where: Prisma.UniversityWhereInput = {};
-    if (query.country) where.countryId = query.country;
-    if (query.search) {
-      where.OR = [
-        { name: { contains: query.search, mode: 'insensitive' } },
-        { city: { contains: query.search, mode: 'insensitive' } },
-      ];
-    }
-    const skip = (query.page - 1) * query.limit;
-    const [items, total] = await Promise.all([
-      prisma.university.findMany({
-        where,
-        orderBy: { name: 'asc' },
-        skip,
-        take: query.limit,
-        include: { country: { select: { id: true, name: true, slug: true } } },
-      }),
-      prisma.university.count({ where }),
-    ]);
-    return { items, meta: { page: query.page, limit: query.limit, total, totalPages: Math.max(1, Math.ceil(total / query.limit)) } };
+    const cacheKey = `admin:universities:list:${query.page}:${query.limit}:${query.country ?? ''}:${query.search ?? ''}`;
+    return responseCache.getOrSet(cacheKey, 30_000, async () => {
+      const where: Prisma.UniversityWhereInput = {};
+      if (query.country) where.countryId = query.country;
+      if (query.search) {
+        where.OR = [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          { city: { contains: query.search, mode: 'insensitive' } },
+        ];
+      }
+      const skip = (query.page - 1) * query.limit;
+      const [items, total] = await Promise.all([
+        prisma.university.findMany({
+          where,
+          orderBy: { name: 'asc' },
+          skip,
+          take: query.limit,
+          include: { country: { select: { id: true, name: true, slug: true } } },
+        }),
+        prisma.university.count({ where }),
+      ]);
+      return { items, meta: { page: query.page, limit: query.limit, total, totalPages: Math.max(1, Math.ceil(total / query.limit)) } };
+    });
   },
 
   async createUniversity(input: CreateUniversityInput, actorId: string, ipAddress?: string | null) {
@@ -260,7 +267,10 @@ export const cmsService = {
     prisma.gallerySetting.upsert({ where: { key: 'homepage-gallery' }, update: data, create: { ...data, key: 'homepage-gallery' } }),
 
   // --- CMS Collections ---
-  listBlogs: () => prisma.blog.findMany({ orderBy: { createdAt: 'desc' } }),
+  listBlogs: () =>
+    responseCache.getOrSet('admin:cms:blogs', 30_000, () =>
+      prisma.blog.findMany({ orderBy: { createdAt: 'desc' } })
+    ),
   createBlog: (data: Record<string, unknown>, actorId: string) => {
     const title = String(data.title);
     const slug = (data.slug as string | undefined) || toSlug(title);
@@ -278,7 +288,10 @@ export const cmsService = {
     prisma.blog.update({ where: { id }, data: { ...(data as Prisma.BlogUpdateInput), updatedById: actorId } }),
   deleteBlog: (id: string) => prisma.blog.delete({ where: { id } }),
 
-  listEvents: () => prisma.event.findMany({ orderBy: { eventDate: 'desc' } }),
+  listEvents: () =>
+    responseCache.getOrSet('admin:cms:events', 30_000, () =>
+      prisma.event.findMany({ orderBy: { eventDate: 'desc' } })
+    ),
   createEvent: (data: Record<string, unknown>, actorId: string) => {
     const title = String(data.title);
     const slug = (data.slug as string | undefined) || toSlug(title);
