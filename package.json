@@ -8,6 +8,7 @@
     "client"
   ],
   "scripts": {
+    "postinstall": "prisma generate --schema=server/prisma/schema.prisma",
     "build:shared": "npm run build --workspace=@zero-compile/shared",
     "build:server": "npm run build --workspace=@zero-compile/server",
     "build:client": "npm run build --workspace=@zero-compile/client",
