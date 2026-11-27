@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: zero-compile-api
+    runtime: node
+    region: ohio
+    plan: free
+    buildCommand: npm install && npm run build:shared && npm run db:generate && npm run build:server
+    startCommand: npm run start --workspace=@zero-compile/server
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: APP_NAME
+        value: Zero Compile
+      - key: REF_CODE_PREFIX
+        value: ZRC
+      - key: TRUST_PROXY
+        value: "true"
+      - key: RATE_LIMIT_STORE
+        value: postgres
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        value: https://study-consultency.vercel.app
+      - key: AUTH_URL
+        value: https://study-consultency.vercel.app

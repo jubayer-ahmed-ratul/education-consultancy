@@ -1,0 +1,22 @@
+{
+  "name": "zero-compile-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=@zero-compile/shared",
+    "build:server": "npm run build --workspace=@zero-compile/server",
+    "build:client": "npm run build --workspace=@zero-compile/client",
+    "build": "npm run build:shared && npm run build:server && npm run build:client",
+    "typecheck": "npm run typecheck --workspace=@zero-compile/shared && npm run typecheck --workspace=@zero-compile/server && npm run typecheck --workspace=@zero-compile/client",
+    "dev:server": "npm run dev --workspace=@zero-compile/server",
+    "dev:client": "npm run dev --workspace=@zero-compile/client",
+    "db:generate": "npm run db:generate --workspace=@zero-compile/server",
+    "db:migrate": "npm run db:migrate --workspace=@zero-compile/server",
+    "db:seed": "npm run db:seed --workspace=@zero-compile/server"
+  }
+}

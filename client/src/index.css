@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  --bg-canvas: #FAF9F6;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F3F1EC;
+  --border-hairline: #E5E2DC;
+  --border-strong: #CFCAC0;
+  --ink-primary: #111827;
+  --ink-secondary: #4B5563;
+  --ink-muted: #6B7280;
+  --brand-primary: #0D3B2E;
+  --brand-primary-hover: #092A20;
+  --brand-secondary: #132A4A;
+  --brand-accent: #D97706;
+  --brand-accent-soft: #FEF3C7;
+
+  /* shadcn/ui semantic variable mappings */
+  --background: #FAF9F6;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
+  --primary: #0D3B2E;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F3F1EC;
+  --secondary-foreground: #111827;
+  --muted: #F3F1EC;
+  --muted-foreground: #6B7280;
+  --accent: #FEF3C7;
+  --accent-foreground: #B45309;
+  --destructive: #BE123C;
+  --destructive-foreground: #FFFFFF;
+  --border: #E5E2DC;
+  --input: #CFCAC0;
+  --ring: #0D3B2E;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
+    line-height: 1.6;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}

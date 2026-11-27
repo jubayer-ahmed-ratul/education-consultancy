@@ -1,0 +1,573 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Enums
+// ==========================================
+
+enum UserRole {
+  super_admin @map("super-admin")
+  admin       @map("admin")
+}
+
+enum IntakeSemester {
+  Spring
+  Summer
+  Fall
+  Winter
+}
+
+enum InquiryCategory {
+  general
+  application
+  visa
+  scholarship
+  accommodation
+  other
+}
+
+enum InquiryStatus {
+  new
+  assigned
+  in_review           @map("in-review")
+  documents_requested @map("documents-requested")
+  documents_received  @map("documents-received")
+  processing
+  approved
+  rejected
+  closed
+}
+
+enum InquiryPriority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum AuditEntityType {
+  inquiry
+  country
+  university
+  user
+}
+
+enum EventLocationType {
+  in_person @map("in-person")
+  online
+  hybrid
+}
+
+// ==========================================
+// 1. Users (Staff Counselors & Super Admins)
+// ==========================================
+
+model User {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  role      UserRole @default(admin)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignedInquiries   Inquiry[]     @relation("InquiryAssignee")
+  assignedByInquiries Inquiry[]     @relation("InquiryAssigner")
+  inquiryNotes        InquiryNote[]
+  activityLogs        ActivityLog[]
+  createdCountries    Country[]
+  createdUniversities University[]
+
+  @@index([role, isActive])
+  @@index([createdAt(sort: Desc)])
+  @@map("users")
+}
+
+// ==========================================
+// 2. Countries (Destinations)
+// ==========================================
+
+model Country {
+  id                    String   @id @default(uuid())
+  name                  String   @unique @db.VarChar(100)
+  slug                  String   @unique @db.VarChar(120)
+  description           String   @db.VarChar(5000)
+  highlights            String[] @default([])
+  imageUrl              String?  @db.VarChar(2048)
+  images                String[] @default([])
+  educationSystem       String?  @db.Text
+  admissionRequirements String?  @db.Text
+  tuitionAndLivingCosts String?  @db.Text
+  visaRequirements      String?  @db.Text
+  intakes               String[] @default([])
+  scholarshipInfo       String?  @db.Text
+  isPublished           Boolean  @default(false)
+  order                 Int      @default(0)
+  createdById           String?
+  createdBy             User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  universities University[]
+  inquiries    Inquiry[]
+
+  @@index([isPublished, createdAt(sort: Desc)])
+  @@index([order])
+  @@map("countries")
+}
+
+// ==========================================
+// 3. Universities
+// ==========================================
+
+model University {
+  id                    String   @id @default(uuid())
+  name                  String   @db.VarChar(150)
+  slug                  String   @unique @db.VarChar(160)
+  countryId             String
+  country               Country  @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  city                  String?  @db.VarChar(100)
+  logoUrl               String?  @db.VarChar(2048)
+  imageUrl              String?  @db.VarChar(2048)
+  images                String[] @default([])
+  description           String   @db.VarChar(5000)
+  programs              String[] @default([])
+  admissionRequirements String?  @db.Text
+  englishRequirements   String?  @db.VarChar(2000)
+  scholarshipDetails    String?  @db.Text
+  applicationDeadlines  String?  @db.VarChar(2000)
+  website               String?  @db.VarChar(2048)
+  tuitionRange          Json?
+  isPublished           Boolean  @default(false)
+  createdById           String?
+  createdBy             User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  inquiries Inquiry[]
+
+  @@index([countryId, isPublished])
+  @@index([isPublished, createdAt(sort: Desc)])
+  @@index([isPublished, name])
+  @@index([countryId, isPublished, name])
+  @@index([name])
+  @@index([createdAt(sort: Desc)])
+  @@map("universities")
+}
+
+// ==========================================
+// 4. Inquiries (+ Normalized Notes & Documents)
+// ==========================================
+
+model Inquiry {
+  id                    String           @id @default(uuid())
+  referenceNumber       String           @unique @db.VarChar(40)
+  studentFirstName      String           @db.VarChar(50)
+  studentLastName       String           @db.VarChar(50)
+  studentEmail          String           @db.VarChar(255)
+  studentPhone          String?          @db.VarChar(30)
+  studentNationality    String?          @db.VarChar(50)
+  currentEducationLevel String           @db.VarChar(100)
+  fieldOfStudy          String?          @db.VarChar(100)
+  gpa                   String?          @db.VarChar(20)
+  englishProficiency    String?          @db.VarChar(100)
+  preferredCountryId    String?
+  preferredCountry      Country?         @relation(fields: [preferredCountryId], references: [id], onDelete: SetNull)
+  preferredUniversityId String?
+  preferredUniversity   University?      @relation(fields: [preferredUniversityId], references: [id], onDelete: SetNull)
+  intendedProgram       String?          @db.VarChar(150)
+  intakeYear            Int?
+  intakeSemester        IntakeSemester?
+  category              InquiryCategory  @default(general)
+  message               String           @db.VarChar(3000)
+  status                InquiryStatus    @default(new)
+  priority              InquiryPriority  @default(normal)
+  assignedToId          String?
+  assignedTo            User?            @relation("InquiryAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedById          String?
+  assignedBy            User?            @relation("InquiryAssigner", fields: [assignedById], references: [id], onDelete: SetNull)
+  assignedAt            DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  notes     InquiryNote[]
+  documents InquiryDocument[]
+
+  @@index([assignedToId, status])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([studentEmail])
+  @@index([createdAt(sort: Desc)])
+  @@index([preferredCountryId, createdAt(sort: Desc)])
+  @@index([preferredUniversityId, createdAt(sort: Desc)])
+  @@index([priority, createdAt(sort: Desc)])
+  @@index([assignedToId, createdAt(sort: Desc)])
+  @@map("inquiries")
+}
+
+model InquiryNote {
+  id          String   @id @default(uuid())
+  inquiryId   String
+  inquiry     Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  content     String   @db.VarChar(5000)
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now())
+
+  @@index([inquiryId, createdAt])
+  @@map("inquiry_notes")
+}
+
+model InquiryDocument {
+  id         String   @id @default(uuid())
+  inquiryId  String
+  inquiry    Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  fileName   String   @db.VarChar(255)
+  fileType   String   @db.VarChar(100)
+  storageKey String   @db.VarChar(500)
+  createdAt  DateTime @default(now())
+
+  @@index([inquiryId])
+  @@map("inquiry_documents")
+}
+
+// ==========================================
+// 5. Counters (Atomic Reference Numbering)
+// ==========================================
+
+model Counter {
+  id  String @id @db.VarChar(100)
+  seq Int    @default(0)
+
+  @@map("counters")
+}
+
+// ==========================================
+// 6. ActivityLogs (Append-Only Audit Trail)
+// ==========================================
+
+model ActivityLog {
+  id            String          @id @default(uuid())
+  action        String          @db.VarChar(100)
+  entityType    AuditEntityType
+  entityId      String          @db.VarChar(100)
+  performedById String?
+  performedBy   User?           @relation(fields: [performedById], references: [id], onDelete: SetNull)
+  details       Json            @default("{}")
+  ipAddress     String?         @db.VarChar(45)
+  createdAt     DateTime        @default(now())
+
+  @@index([entityType, entityId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@index([performedById, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("activity_logs")
+}
+
+// ==========================================
+// 7. RateLimits (TTL replaced by resetAt + cleanup)
+// ==========================================
+
+model RateLimit {
+  id        String   @id @db.VarChar(256)
+  count     Int      @default(1)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
+  @@map("rate_limits")
+}
+
+// ==========================================
+// 8. SystemLocks (Distributed Lease Lock)
+// ==========================================
+
+model SystemLock {
+  id        String   @id @db.VarChar(100)
+  lockedBy  String   @db.VarChar(100)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("system_locks")
+}
+
+// ==========================================
+// 9. RecoveryTokens (6-digit SHA-256 OTP)
+// ==========================================
+
+model RecoveryToken {
+  id         String    @id @default(uuid())
+  email      String    @db.VarChar(255)
+  hashedCode String    @db.VarChar(128)
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+  @@map("recovery_tokens")
+}
+
+// ==========================================
+// 10-14. CMS Collection Models
+// ==========================================
+
+model Blog {
+  id             String    @id @default(uuid())
+  title          String    @db.VarChar(200)
+  slug           String    @unique @db.VarChar(220)
+  excerpt        String    @db.VarChar(500)
+  content        String    @db.Text
+  featuredImage  Json?
+  category       String    @default("Study Abroad Guide") @db.VarChar(100)
+  author         String    @default("Zero Compile Editorial Desk") @db.VarChar(100)
+  isPublished    Boolean   @default(false)
+  publishedAt    DateTime?
+  seoTitle       String?   @db.VarChar(100)
+  seoDescription String?   @db.VarChar(255)
+  createdById    String?
+  updatedById    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([isPublished, publishedAt(sort: Desc)])
+  @@index([isPublished, category, publishedAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("blogs")
+}
+
+model Event {
+  id               String            @id @default(uuid())
+  title            String            @db.VarChar(200)
+  slug             String            @unique @db.VarChar(220)
+  shortDescription String            @db.VarChar(500)
+  fullDescription  String            @db.Text
+  eventBanner      Json?
+  eventDate        DateTime
+  startTime        String            @default("10:00 AM") @db.VarChar(40)
+  endTime          String            @default("02:00 PM") @db.VarChar(40)
+  timeZone         String            @default("Asia/Dhaka") @db.VarChar(60)
+  locationType     EventLocationType @default(in_person)
+  venue            String            @db.VarChar(300)
+  registrationUrl  String?           @db.VarChar(2048)
+  isPublished      Boolean           @default(false)
+  seoTitle         String?           @db.VarChar(100)
+  seoDescription   String?           @db.VarChar(255)
+  createdById      String?
+  updatedById      String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([isPublished, eventDate])
+  @@index([isPublished, eventDate(sort: Desc)], map: "events_isPublished_eventDate_desc_idx")
+  @@index([eventDate(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("events")
+}
+
+model SuccessStory {
+  id            String   @id @default(uuid())
+  name          String   @db.VarChar(100)
+  title         String?  @db.VarChar(200)
+  youtubeUrl    String?  @db.VarChar(500)
+  thumbnailUrl  String?  @db.VarChar(2048)
+  slug          String   @unique @db.VarChar(220)
+  studentImage  String?  @db.VarChar(2048)
+  country       String   @db.VarChar(100)
+  countryFlag   String?  @db.VarChar(10)
+  university    String   @db.VarChar(150)
+  program       String   @db.VarChar(150)
+  testimonial   String   @db.VarChar(2000)
+  achievement   String?  @db.VarChar(100)
+  admissionYear String?  @db.VarChar(20)
+  displayOrder  Int      @default(0)
+  isPublished   Boolean  @default(false)
+  createdById   String?
+  updatedById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isPublished, displayOrder, createdAt(sort: Desc)])
+  @@map("success_stories")
+}
+
+model GalleryItem {
+  id           String   @id @default(uuid())
+  title        String   @db.VarChar(120)
+  imageUrl     String   @db.VarChar(2048)
+  description  String?  @db.VarChar(300)
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(false)
+  createdById  String?
+  updatedById  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isPublished, displayOrder, createdAt(sort: Desc)])
+  @@map("gallery_items")
+}
+
+model SisterConcern {
+  id           String   @id @default(uuid())
+  name         String   @db.VarChar(100)
+  logoUrl      String   @db.VarChar(2048)
+  description  String   @db.VarChar(300)
+  websiteUrl   String   @db.VarChar(2048)
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdById  String?
+  updatedById  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isPublished, displayOrder, createdAt(sort: Desc)])
+  @@map("sister_concerns")
+}
+
+// ==========================================
+// 15-23. CMS Singleton Models
+// ==========================================
+
+model SiteContent {
+  id                  String   @id @default(uuid())
+  key                 String   @unique @default("homepage-about") @db.VarChar(100)
+  heading             String   @db.VarChar(200)
+  highlightTitle      String?  @db.VarChar(200)
+  bodyParagraphs      String[] @default([])
+  buttonText          String   @default("Learn More") @db.VarChar(60)
+  buttonLink          String   @default("/about") @db.VarChar(200)
+  mainImageUrl        String?  @db.VarChar(2048)
+  topRightImageUrl    String?  @db.VarChar(2048)
+  bottomRightImageUrl String?  @db.VarChar(2048)
+  yearsBadgeText      String   @default("10+ Years Experience") @db.VarChar(100)
+  updatedAt           DateTime @updatedAt
+
+  @@map("site_contents")
+}
+
+model AboutPage {
+  id                  String   @id @default(uuid())
+  key                 String   @unique @default("about-page") @db.VarChar(100)
+  whoWeAreTitle       String   @default("Who We Are") @db.VarChar(200)
+  whoWeAreBody        String   @default("") @db.Text
+  establishmentYear   String   @default("2015") @db.VarChar(20)
+  establishmentStory  String   @default("") @db.Text
+  milestones          Json     @default("[]")
+  companyOverview     String   @default("") @db.Text
+  chairmanName        String   @default("") @db.VarChar(120)
+  chairmanTitle       String   @default("Chairman") @db.VarChar(120)
+  chairmanPortraitUrl String?  @db.VarChar(2048)
+  chairmanMessage     String   @default("") @db.Text
+  chairmanSignature   String?  @db.VarChar(200)
+  teamMembers         Json     @default("[]")
+  whyChooseUs         Json     @default("[]")
+  ctaHeading          String   @default("Ready to Start Your Global Journey?") @db.VarChar(200)
+  ctaButtonText       String   @default("Apply Now") @db.VarChar(60)
+  ctaButtonLink       String   @default("/apply") @db.VarChar(200)
+  seoTitle            String?  @db.VarChar(100)
+  seoDescription      String?  @db.VarChar(255)
+  updatedAt           DateTime @updatedAt
+
+  @@map("about_pages")
+}
+
+model ContactPage {
+  id             String   @id @default(uuid())
+  key            String   @unique @default("contact-page") @db.VarChar(100)
+  headerTitle    String   @default("Contact Zero Compile") @db.VarChar(200)
+  headerSubtitle String   @default("Speak with our admissions counselors.") @db.VarChar(500)
+  address        String   @default("") @db.VarChar(500)
+  phones         String[] @default([])
+  whatsappNumber String?  @db.VarChar(40)
+  emails         String[] @default([])
+  officeHours    String   @default("Sun–Thu: 10:00 AM – 6:00 PM") @db.VarChar(200)
+  socialLinks    Json     @default("{}")
+  mapLatitude    Float    @default(23.8103)
+  mapLongitude   Float    @default(90.4125)
+  mapZoom        Int      @default(14)
+  mapAddress     String   @default("") @db.VarChar(300)
+  ctaHeading     String   @default("Book a Free Consultation") @db.VarChar(200)
+  seoTitle       String?  @db.VarChar(100)
+  seoDescription String?  @db.VarChar(255)
+  updatedAt      DateTime @updatedAt
+
+  @@map("contact_pages")
+}
+
+model HeroContent {
+  id           String   @id @default(uuid())
+  singletonKey String   @unique @default("hero-content") @db.VarChar(100)
+  heading      String   @db.VarChar(200)
+  subheading   String   @default("") @db.VarChar(200)
+  description  String   @default("") @db.VarChar(1000)
+  slides       Json     @default("[]")
+  updatedAt    DateTime @updatedAt
+
+  @@map("hero_contents")
+}
+
+model HeroStat {
+  id        String   @id @default(uuid())
+  order     Int      @unique
+  label     String   @db.VarChar(100)
+  value     String   @db.VarChar(40)
+  suffix    String?  @db.VarChar(20)
+  updatedAt DateTime @updatedAt
+
+  @@map("hero_stats")
+}
+
+model FooterSetting {
+  id                   String   @id @default(uuid())
+  key                  String   @unique @default("footer-setting") @db.VarChar(100)
+  socialLinks          Json     @default("{}")
+  featuredCountrySlugs String[] @default([])
+  updatedAt            DateTime @updatedAt
+
+  @@map("footer_settings")
+}
+
+model WhatsAppSetting {
+  id             String   @id @default(uuid())
+  key            String   @unique @default("whatsapp-contact") @db.VarChar(100)
+  phoneNumber    String   @db.VarChar(30)
+  defaultMessage String?  @db.VarChar(300)
+  isEnabled      Boolean  @default(true)
+  updatedAt      DateTime @updatedAt
+
+  @@map("whatsapp_settings")
+}
+
+model SuccessStoriesPageSetting {
+  id             String   @id @default(uuid())
+  key            String   @unique @default("success-stories-page") @db.VarChar(100)
+  heroHeading    String   @db.VarChar(200)
+  heroSubtitle   String   @default("") @db.VarChar(500)
+  ctaHeading     String   @default("Write Your Own Success Story") @db.VarChar(200)
+  ctaButtonText  String   @default("Apply Today") @db.VarChar(60)
+  ctaButtonLink  String   @default("/apply") @db.VarChar(200)
+  seoTitle       String?  @db.VarChar(100)
+  seoDescription String?  @db.VarChar(255)
+  updatedAt      DateTime @updatedAt
+
+  @@map("success_stories_page_settings")
+}
+
+model GallerySetting {
+  id          String   @id @default(uuid())
+  key         String   @unique @default("homepage-gallery") @db.VarChar(100)
+  heading     String   @db.VarChar(200)
+  description String   @default("") @db.VarChar(500)
+  ctaText     String   @default("View Full Gallery") @db.VarChar(60)
+  updatedAt   DateTime @updatedAt
+
+  @@map("gallery_settings")
+}
