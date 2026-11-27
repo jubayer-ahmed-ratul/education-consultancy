@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { ArrowUpRight, Compass, Menu, MessageCircle, Search } from 'lucide-react';
@@ -28,6 +28,26 @@ export default function PublicLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [isScrolled, setIsScrolled] = useState(() =>
+    typeof window !== 'undefined' ? window.scrollY > 24 : false
+  );
+
+  useEffect(() => {
+    let ticking = false;
+    const updateScroll = () => {
+      const next = window.scrollY > 24;
+      setIsScrolled((prev) => (prev === next ? prev : next));
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateScroll);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handlePrefetch = (to: string) => () => {
     void prefetchRoute(queryClient, to);
@@ -56,9 +76,19 @@ export default function PublicLayout() {
     <div className="flex min-h-screen flex-col bg-white text-zinc-950">
       <ScrollToTop />
 
-      {/* Clean Reference-Inspired Sticky Header */}
-      <header className="sticky top-0 z-40 h-16 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex h-full max-w-11/12 items-center justify-between gap-4 px-4 sm:px-6">
+      {/* Scroll-Aware Floating Header */}
+      <header
+        className={`fixed left-1/2 z-50 -translate-x-1/2 transition-all duration-300 ease-out ${
+          isScrolled
+            ? 'top-3 w-11/12 max-w-7xl rounded-2xl bg-white/90 px-5 py-2.5 shadow-lg shadow-zinc-950/5 ring-1 ring-zinc-950/10 backdrop-blur-md'
+            : 'top-0 w-full rounded-none border-b border-zinc-200/70 bg-white/95 py-4 backdrop-blur-md'
+        }`}
+      >
+        <div
+          className={`mx-auto flex items-center justify-between gap-4 ${
+            isScrolled ? 'w-full' : 'max-w-11/12 px-4 sm:px-6'
+          }`}
+        >
           {/* Left: Brand Wordmark */}
           <Link to="/" className="flex items-center gap-2.5 group shrink-0">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white transition-colors group-hover:bg-teal-600">
@@ -112,7 +142,7 @@ export default function PublicLayout() {
               to="/apply"
               className="inline-flex h-9 items-center rounded-full bg-teal-600 px-5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-teal-700"
             >
-              Book Consultation
+              Book Free Consultation
             </Link>
             <button
               type="button"
@@ -196,7 +226,7 @@ export default function PublicLayout() {
         </SheetContent>
       </Sheet>
 
-      <main className="flex-1 bg-[#F8FAFC]">
+      <main className="flex-1 bg-[#F8FAFC] pt-[72px]">
         <Outlet />
       </main>
 
