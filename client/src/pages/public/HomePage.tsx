@@ -1,14 +1,10 @@
-import { useCallback, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import useEmblaCarousel from 'embla-carousel-react';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  Award,
   BookOpen,
   Calendar,
-  ChevronLeft,
-  ChevronRight,
   Globe2,
   Search,
 } from 'lucide-react';
@@ -18,8 +14,8 @@ import { AboutPreviewSection } from '../../components/AboutPreviewSection';
 import { AnimatedNumber } from '../../components/AnimatedNumber';
 import { HowItWorksSection } from '../../components/HowItWorksSection';
 import { ServicesSection } from '../../components/ServicesSection';
+import { SuccessStoriesSection } from '../../components/SuccessStoriesSection';
 import { UniversitiesMarqueeSection } from '../../components/UniversitiesMarqueeSection';
-import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { usePublicBundle } from '../../hooks/usePublicBundle';
 import { apiRequest } from '../../lib/api-client';
@@ -38,10 +34,6 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { data: bundle, isLoading } = usePublicBundle();
   const [heroSearch, setHeroSearch] = useState('');
-
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', loop: false });
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   const { data: countriesRes } = useQuery({
     queryKey: queryKeys.countries.publicList({ page: 1, limit: 6 }),
@@ -269,75 +261,8 @@ export default function HomePage() {
       {/* 6-Step Ascending Curved Path — How It Works */}
       <HowItWorksSection />
 
-      {/* Success Stories Carousel (Embla) */}
-      {stories.length > 0 && (
-        <section className="mx-auto max-w-11/12 space-y-6 px-4 sm:px-6">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
-                <Award className="h-3.5 w-3.5" /> Alumni Outcomes
-              </div>
-              <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">
-                Student Success Stories
-              </h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                onClick={scrollPrev}
-                aria-label="Previous story"
-              >
-                <ChevronLeft className="h-4 w-4 text-zinc-950" />
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                onClick={scrollNext}
-                aria-label="Next story"
-              >
-                <ChevronRight className="h-4 w-4 text-zinc-950" />
-              </Button>
-              <Link
-                to="/success-stories"
-                className="ml-2 inline-flex items-center gap-1 text-sm font-semibold text-teal-700 hover:text-teal-800"
-              >
-                All Stories <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-
-          <div ref={emblaRef} className="overflow-hidden">
-            <div className="flex gap-5">
-              {stories.map((s) => (
-                <div
-                  key={s.id}
-                  className="min-w-0 flex-[0_0_100%] sm:flex-[0_0_48%] lg:flex-[0_0_32%] rounded-xl bg-white p-6 ring-1 ring-zinc-950/10 space-y-3"
-                >
-                  <div className="flex items-center justify-between text-xs text-zinc-600">
-                    <span className="font-semibold text-zinc-950">
-                      {s.countryFlag} {s.country}
-                    </span>
-                    {s.admissionYear && <span className="font-mono">{s.admissionYear}</span>}
-                  </div>
-                  <div className="font-display text-base font-bold text-zinc-950">{s.name}</div>
-                  <div className="text-xs font-semibold text-teal-700">
-                    {s.program} — {s.university}
-                  </div>
-                  {s.achievement && (
-                    <Badge variant="success" className="bg-teal-50 text-teal-700 border-teal-200">
-                      {s.achievement}
-                    </Badge>
-                  )}
-                  <p className="text-xs leading-relaxed text-zinc-700 line-clamp-4">“{s.testimonial}”</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* 6-Card Center-Focus Peek Carousel — Success Stories */}
+      <SuccessStoriesSection stories={stories} />
 
       {/* Latest Blogs & Upcoming Events */}
       <section className="mx-auto grid max-w-11/12 grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2">
