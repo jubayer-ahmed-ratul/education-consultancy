@@ -8,11 +8,10 @@ import { sendSuccess } from '../utils/response';
 const COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 function getCookieOptions() {
-  const isProd = env.NODE_ENV === 'production';
   return {
     httpOnly: true,
-    secure: isProd,
-    sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
     maxAge: COOKIE_MAX_AGE_MS,
     path: '/',
   };
@@ -37,11 +36,10 @@ export const authController = {
       const ipAddress = extractClientIp(req);
       await authService.logout(req.user?.id, ipAddress);
 
-      const isProd = env.NODE_ENV === 'production';
       res.clearCookie(env.COOKIE_NAME, {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? 'none' : 'lax',
+        secure: env.NODE_ENV === 'production',
+        sameSite: 'lax',
         path: '/',
       });
       sendSuccess(res, { message: 'Logged out successfully.' });
