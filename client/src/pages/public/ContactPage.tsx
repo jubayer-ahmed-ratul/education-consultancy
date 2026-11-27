@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, Clock, Mail, MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Button } from '../../components/ui/button';
 import { apiRequest } from '../../lib/api-client';
 
 interface ContactPageData {
@@ -26,70 +27,82 @@ export default function ContactPage() {
     queryFn: () => apiRequest<ContactPageData | null>('/content/contact-page'),
   });
 
-  if (isLoading) return <div className="mx-auto max-w-4xl px-4 py-10 text-sm text-[#6B7280]">Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-4 px-4 py-10">
+        <div className="h-8 w-56 animate-pulse rounded bg-zinc-200/70" />
+        <div className="h-44 animate-pulse rounded-xl bg-zinc-200/70" />
+      </div>
+    );
+  }
   const contact = data?.data;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 space-y-8">
+    <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
         <title>{contact?.seoTitle || 'Contact Us'} — Zero Compile</title>
         {contact?.seoDescription && <meta name="description" content={contact.seoDescription} />}
       </Helmet>
 
-      <div className="border-b border-[#E5E2DC] pb-6 space-y-1">
-        <span className="text-xs font-semibold uppercase tracking-wider text-[#D97706]">Admissions Desk</span>
-        <h1 className="font-display text-3xl font-bold text-[#111827]">{contact?.headerTitle || 'Contact Zero Compile'}</h1>
-        <p className="text-sm text-[#4B5563]">{contact?.headerSubtitle}</p>
+      <div className="space-y-1 border-b border-zinc-200 pb-6">
+        <span className="text-xs font-semibold uppercase tracking-wider text-teal-700">
+          Admissions Desk
+        </span>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-zinc-950">
+          {contact?.headerTitle || 'Contact Zero Compile'}
+        </h1>
+        <p className="text-sm text-zinc-700">{contact?.headerSubtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <div className="rounded-lg border border-[#E5E2DC] bg-white p-6 space-y-4 text-sm">
+        <div className="space-y-4 rounded-xl bg-white p-6 text-sm ring-1 ring-zinc-950/10">
           <div className="flex items-start gap-3">
-            <MapPin className="h-4 w-4 shrink-0 text-[#0D3B2E] mt-1" />
+            <MapPin className="mt-1 h-4 w-4 shrink-0 text-teal-600" />
             <div>
-              <div className="font-semibold text-[#111827]">Office Address</div>
-              <div className="text-[#4B5563]">{contact?.address}</div>
+              <div className="font-semibold text-zinc-950">Office Address</div>
+              <div className="text-zinc-700">{contact?.address}</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <Clock className="h-4 w-4 shrink-0 text-[#0D3B2E] mt-1" />
+            <Clock className="mt-1 h-4 w-4 shrink-0 text-teal-600" />
             <div>
-              <div className="font-semibold text-[#111827]">Office Hours</div>
-              <div className="text-[#4B5563]">{contact?.officeHours}</div>
+              <div className="font-semibold text-zinc-950">Office Hours</div>
+              <div className="text-zinc-700">{contact?.officeHours}</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <Phone className="h-4 w-4 shrink-0 text-[#0D3B2E] mt-1" />
+            <Phone className="mt-1 h-4 w-4 shrink-0 text-teal-600" />
             <div>
-              <div className="font-semibold text-[#111827]">Phone & WhatsApp</div>
-              <div className="text-[#4B5563]">{contact?.phones.join(', ') || '—'}</div>
-              {contact?.whatsappNumber && <div className="text-xs text-[#6B7280]">WhatsApp: {contact.whatsappNumber}</div>}
+              <div className="font-semibold text-zinc-950">Phone & WhatsApp</div>
+              <div className="text-zinc-700">{contact?.phones.join(', ') || '—'}</div>
+              {contact?.whatsappNumber && (
+                <div className="text-xs text-zinc-600">WhatsApp: {contact.whatsappNumber}</div>
+              )}
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <Mail className="h-4 w-4 shrink-0 text-[#0D3B2E] mt-1" />
+            <Mail className="mt-1 h-4 w-4 shrink-0 text-teal-600" />
             <div>
-              <div className="font-semibold text-[#111827]">Email</div>
-              <div className="text-[#4B5563]">{contact?.emails.join(', ') || '—'}</div>
+              <div className="font-semibold text-zinc-950">Email</div>
+              <div className="text-zinc-700">{contact?.emails.join(', ') || '—'}</div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-lg border border-[#E5E2DC] bg-white p-6 space-y-4">
+        <div className="flex flex-col justify-between space-y-4 rounded-xl bg-white p-6 ring-1 ring-zinc-950/10">
           <div className="space-y-2">
-            <div className="font-display text-base font-bold text-[#111827]">Visit or Apply Online</div>
-            <p className="text-xs text-[#6B7280]">
-              {contact?.mapAddress || contact?.address}
-            </p>
-            <div className="font-mono text-xs text-[#6B7280]">
+            <div className="font-display text-base font-bold text-zinc-950">
+              Visit or Apply Online
+            </div>
+            <p className="text-xs text-zinc-700">{contact?.mapAddress || contact?.address}</p>
+            <div className="font-mono text-xs text-zinc-600">
               Coordinates: {contact?.mapLatitude}, {contact?.mapLongitude}
             </div>
           </div>
-          <Link
-            to="/apply"
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0D3B2E] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#092A20]"
-          >
-            {contact?.ctaHeading || 'Submit Online Inquiry'} <ArrowRight className="h-4 w-4" />
+          <Link to="/apply">
+            <Button className="w-full bg-teal-600 text-white hover:bg-teal-700">
+              {contact?.ctaHeading || 'Book Free Consultation'} <ArrowRight className="h-4 w-4" />
+            </Button>
           </Link>
         </div>
       </div>

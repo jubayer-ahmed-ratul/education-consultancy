@@ -1,34 +1,43 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { usePublicBundle } from '../../hooks/usePublicBundle';
 
 export default function GalleryPage() {
   const { data: bundle, isLoading } = usePublicBundle();
   const settings = bundle?.gallerySetting;
   const items = bundle?.galleryItems ?? [];
-  const [selected, setSelected] = useState<{ title: string; imageUrl: string; description?: string | null } | null>(null);
+  const [selected, setSelected] = useState<{
+    title: string;
+    imageUrl: string;
+    description?: string | null;
+  } | null>(null);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
         <title>{settings?.heading || 'Gallery'} — Zero Compile</title>
       </Helmet>
 
-      <div className="border-b border-[#E5E2DC] pb-6 space-y-1">
-        <span className="text-xs font-semibold uppercase tracking-wider text-[#D97706]">Campus & Events</span>
-        <h1 className="font-display text-3xl font-bold text-[#111827]">{settings?.heading || 'Media Gallery'}</h1>
-        <p className="text-sm text-[#4B5563]">{settings?.description}</p>
+      <div className="space-y-1 border-b border-zinc-200 pb-6">
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
+          <ImageIcon className="h-3.5 w-3.5" /> Campus & Events
+        </span>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-zinc-950">
+          {settings?.heading || 'Media Gallery'}
+        </h1>
+        <p className="text-sm text-zinc-700">{settings?.description}</p>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="aspect-[16/10] animate-pulse rounded-lg bg-[#F3F1EC]" />
+            <div key={i} className="aspect-[16/10] animate-pulse rounded-xl bg-zinc-200/70" />
           ))}
         </div>
       ) : !items.length ? (
-        <div className="rounded-lg border border-[#E5E2DC] bg-white p-10 text-center text-sm text-[#6B7280]">
+        <div className="rounded-xl bg-white p-10 text-center text-sm text-zinc-600 ring-1 ring-zinc-950/10">
           No gallery items published yet.
         </div>
       ) : (
@@ -38,53 +47,48 @@ export default function GalleryPage() {
               key={item.id}
               type="button"
               onClick={() => setSelected(item)}
-              className="group text-left rounded-lg border border-[#E5E2DC] bg-white overflow-hidden transition-all hover:border-[#CFCAC0] hover:shadow-sm"
+              className="group overflow-hidden rounded-xl bg-white text-left ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40 hover:shadow-sm cursor-pointer"
             >
-              <div className="aspect-[16/10] w-full overflow-hidden bg-[#F3F1EC]">
+              <div className="aspect-[16/10] w-full overflow-hidden bg-zinc-100">
                 <img
                   src={item.imageUrl}
                   alt={item.title}
                   loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                 />
               </div>
-              <div className="p-4 space-y-1">
-                <div className="font-display font-semibold text-sm text-[#111827]">{item.title}</div>
-                {item.description && <div className="text-xs text-[#6B7280]">{item.description}</div>}
+              <div className="space-y-1 p-4">
+                <div className="font-display text-sm font-bold text-zinc-950">{item.title}</div>
+                {item.description && <div className="text-xs text-zinc-600">{item.description}</div>}
               </div>
             </button>
           ))}
         </div>
       )}
 
-      {/* Clean Lightbox Modal */}
-      {selected && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelected(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-w-3xl w-full rounded-lg bg-white overflow-hidden shadow-xl"
-          >
-            <button
-              type="button"
-              aria-label="Close preview"
-              onClick={() => setSelected(null)}
-              className="absolute right-3 top-3 rounded-full bg-white/90 p-1.5 text-[#111827] shadow"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <img src={selected.imageUrl} alt={selected.title} className="max-h-[75vh] w-full object-contain bg-black" />
-            <div className="p-4">
-              <div className="font-display font-bold text-[#111827]">{selected.title}</div>
-              {selected.description && <p className="mt-1 text-xs text-[#4B5563]">{selected.description}</p>}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Radix Lightbox Dialog */}
+      <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
+        <DialogContent className="max-w-3xl overflow-hidden p-0">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{selected?.title || 'Image Preview'}</DialogTitle>
+          </DialogHeader>
+          {selected && (
+            <>
+              <img
+                src={selected.imageUrl}
+                alt={selected.title}
+                className="max-h-[75vh] w-full bg-zinc-950 object-contain"
+              />
+              <div className="p-4">
+                <div className="font-display font-bold text-zinc-950">{selected.title}</div>
+                {selected.description && (
+                  <p className="mt-1 text-xs text-zinc-700">{selected.description}</p>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

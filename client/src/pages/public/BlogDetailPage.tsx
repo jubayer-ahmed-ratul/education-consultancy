@@ -25,28 +25,50 @@ export default function BlogDetailPage() {
     enabled: Boolean(slug),
   });
 
-  if (isLoading) return <div className="mx-auto max-w-3xl px-4 py-10 text-sm text-[#6B7280]">Loading article...</div>;
-  if (error || !data?.data) return <div className="mx-auto max-w-3xl px-4 py-10 text-sm text-rose-700">Article not found.</div>;
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-4 px-4 py-10">
+        <div className="h-8 w-56 animate-pulse rounded bg-zinc-200/70" />
+        <div className="h-60 animate-pulse rounded-xl bg-zinc-200/70" />
+      </div>
+    );
+  }
+
+  if (error || !data?.data) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-3 px-4 py-12 text-center">
+        <p className="text-sm font-medium text-rose-700">Article not found.</p>
+        <Link to="/blogs" className="text-sm font-semibold text-teal-700 underline">
+          Back to Blogs
+        </Link>
+      </div>
+    );
+  }
 
   const b = data.data;
   return (
-    <article className="mx-auto max-w-3xl px-4 py-10 sm:px-6 space-y-6">
+    <article className="mx-auto max-w-3xl space-y-6 px-4 py-10 sm:px-6">
       <Helmet>
         <title>{b.seoTitle || b.title} — Zero Compile</title>
         <meta name="description" content={b.seoDescription || b.excerpt} />
       </Helmet>
 
-      <Link to="/blogs" className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4B5563] hover:text-[#111827]">
+      <Link
+        to="/blogs"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 hover:text-zinc-950"
+      >
         <ArrowLeft className="h-3.5 w-3.5" /> Back to Blogs
       </Link>
 
-      <div className="rounded-lg border border-[#E5E2DC] bg-white p-6 sm:p-10 space-y-5">
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#D97706]">
+      <div className="space-y-5 rounded-xl bg-white p-6 ring-1 ring-zinc-950/10 sm:p-10">
+        <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
           {b.category} • {b.author}
         </div>
-        <h1 className="font-display text-3xl font-bold leading-tight text-[#111827]">{b.title}</h1>
-        <p className="text-base leading-relaxed text-[#4B5563]">{b.excerpt}</p>
-        <div className="border-t border-[#E5E2DC] pt-6 whitespace-pre-wrap text-sm leading-relaxed text-[#111827]">
+        <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-zinc-950">
+          {b.title}
+        </h1>
+        <p className="text-base leading-relaxed text-zinc-700">{b.excerpt}</p>
+        <div className="whitespace-pre-wrap border-t border-zinc-200 pt-6 text-sm leading-relaxed text-zinc-950">
           {b.content}
         </div>
       </div>

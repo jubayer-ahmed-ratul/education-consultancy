@@ -3,6 +3,8 @@ import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-quer
 import { Calendar, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Badge } from '../../components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { apiRequest } from '../../lib/api-client';
 import { prefetchEvent } from '../../lib/prefetch';
 
@@ -28,42 +30,37 @@ export default function EventsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
         <title>Events & Fairs — Zero Compile</title>
       </Helmet>
 
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E5E2DC] pb-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-6">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#D97706]">Admissions Calendar</span>
-          <h1 className="mt-1 font-display text-3xl font-bold text-[#111827]">Educational Events & Expos</h1>
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
+            <Calendar className="h-3.5 w-3.5" /> Admissions Calendar
+          </span>
+          <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-zinc-950">
+            Educational Events & Expos
+          </h1>
         </div>
-        <div className="flex gap-2">
-          {(['all', 'upcoming', 'past'] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFilter(f)}
-              className={`rounded-md px-3.5 py-2 text-xs font-semibold capitalize transition-colors ${
-                filter === f
-                  ? 'bg-[#0D3B2E] text-white'
-                  : 'border border-[#CFCAC0] bg-white text-[#4B5563] hover:bg-[#F3F1EC]'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'upcoming' | 'past')}>
+          <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="past">Past</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           {[1, 2].map((i) => (
-            <div key={i} className="h-36 animate-pulse rounded-lg border border-[#E5E2DC] bg-[#F3F1EC]" />
+            <div key={i} className="h-36 animate-pulse rounded-xl bg-zinc-200/70" />
           ))}
         </div>
       ) : !data?.data.length ? (
-        <div className="rounded-lg border border-[#E5E2DC] bg-white p-10 text-center text-sm text-[#6B7280]">
+        <div className="rounded-xl bg-white p-10 text-center text-sm text-zinc-600 ring-1 ring-zinc-950/10">
           No events found for this filter.
         </div>
       ) : (
@@ -75,21 +72,21 @@ export default function EventsPage() {
               onMouseEnter={() => void prefetchEvent(queryClient, ev.slug)}
               onTouchStart={() => void prefetchEvent(queryClient, ev.slug)}
               onFocus={() => void prefetchEvent(queryClient, ev.slug)}
-              className="group rounded-lg border border-[#E5E2DC] bg-white p-6 transition-all hover:border-[#CFCAC0] hover:shadow-sm space-y-3"
+              className="group space-y-3 rounded-xl bg-white p-6 ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40 hover:shadow-sm"
             >
-              <div className="flex items-center justify-between text-xs font-medium text-[#0D3B2E]">
-                <span className="inline-flex items-center gap-1.5 font-mono">
+              <div className="flex items-center justify-between text-xs font-medium text-teal-700">
+                <span className="inline-flex items-center gap-1.5 font-mono font-semibold">
                   <Calendar className="h-3.5 w-3.5" /> {new Date(ev.eventDate).toLocaleDateString()}
                 </span>
-                <span className="rounded-full bg-[#FEF3C7] px-2.5 py-0.5 text-[11px] font-semibold uppercase text-[#B45309]">
+                <Badge variant="success" className="bg-teal-50 text-teal-700 border-teal-200 uppercase">
                   {ev.locationType.replace('_', '-')}
-                </span>
+                </Badge>
               </div>
-              <h2 className="font-display text-lg font-bold text-[#111827] group-hover:text-[#0D3B2E]">
+              <h2 className="font-display text-lg font-bold text-zinc-950 group-hover:text-teal-700">
                 {ev.title}
               </h2>
-              <p className="text-sm text-[#4B5563]">{ev.shortDescription}</p>
-              <div className="inline-flex items-center gap-1.5 text-xs text-[#6B7280]">
+              <p className="text-sm text-zinc-700">{ev.shortDescription}</p>
+              <div className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600">
                 <MapPin className="h-3.5 w-3.5" /> {ev.venue}
               </div>
             </Link>
