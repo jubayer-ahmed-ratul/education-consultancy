@@ -237,7 +237,7 @@ export default function AdminLayout() {
                             `group flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-all ${
                               isActive
                                 ? 'bg-white text-zinc-950 font-semibold shadow-sm'
-                                : 'text-white/80 font-medium hover:bg-white/10 hover:text-white'
+                                : 'text-white/90 font-medium hover:bg-white/10 hover:text-white'
                             }`
                           }
                         >
@@ -246,10 +246,14 @@ export default function AdminLayout() {
                               <span className="flex items-center gap-3 min-w-0">
                                 <Icon
                                   className={`h-4 w-4 shrink-0 ${
-                                    isActive ? 'text-zinc-950' : 'text-white/75 group-hover:text-white'
+                                    isActive ? 'text-zinc-950' : 'text-white'
                                   }`}
                                 />
-                                {!isCollapsed && <span className="truncate">{item.label}</span>}
+                                {!isCollapsed && (
+                                  <span className={`truncate ${isActive ? 'text-zinc-950' : 'text-white/90 group-hover:text-white'}`}>
+                                    {item.label}
+                                  </span>
+                                )}
                               </span>
                               {!isCollapsed && item.badgeKey === 'inquiries' && newInquiryCount > 0 && (
                                 <span
