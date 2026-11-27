@@ -1,20 +1,22 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Link, NavLink, Outlet } from 'react-router-dom';
-import { ArrowUpRight, Compass, Menu, MessageCircle } from 'lucide-react';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { ArrowUpRight, Compass, Menu, MessageCircle, Search } from 'lucide-react';
 import { ScrollToTop } from '../components/ScrollToTop';
 import { Button } from '../components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Input } from '../components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../components/ui/sheet';
 import { usePublicBundle } from '../hooks/usePublicBundle';
 import { prefetchRoute } from '../lib/prefetch';
 
 const NAV_LINKS = [
+  { to: '/', label: 'Home', end: true },
   { to: '/destinations', label: 'Destinations' },
   { to: '/universities', label: 'Universities' },
   { to: '/success-stories', label: 'Success Stories' },
   { to: '/events', label: 'Events' },
   { to: '/blogs', label: 'Blogs' },
-  { to: '/gallery', label: 'Gallery' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
 ];
@@ -22,11 +24,22 @@ const NAV_LINKS = [
 export default function PublicLayout() {
   const { data: bundle } = usePublicBundle();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const handlePrefetch = (to: string) => () => {
     void prefetchRoute(queryClient, to);
   };
+
+  function handleQuickSearch(e: FormEvent) {
+    e.preventDefault();
+    const q = searchText.trim();
+    setSearchOpen(false);
+    setSearchText('');
+    navigate(q ? `/universities?search=${encodeURIComponent(q)}` : '/universities');
+  }
 
   const whatsapp = bundle?.whatsappSetting;
   const footer = bundle?.footerSetting;
@@ -40,34 +53,37 @@ export default function PublicLayout() {
       : null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8FAFC] text-zinc-950">
+    <div className="flex min-h-screen flex-col bg-white text-zinc-950">
       <ScrollToTop />
 
-      {/* Sticky Glassmorphic Header */}
-      <header className="sticky top-0 z-40 h-16 border-b border-zinc-200 bg-white/90 backdrop-blur-md">
+      {/* Clean Reference-Inspired Sticky Header */}
+      <header className="sticky top-0 z-40 h-16 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex h-full max-w-11/12 items-center justify-between gap-4 px-4 sm:px-6">
+          {/* Left: Brand Wordmark */}
           <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-600 text-white shadow-xs transition-colors group-hover:bg-teal-700">
-              <Compass className="h-4.5 w-4.5" />
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white transition-colors group-hover:bg-teal-600">
+              <Compass className="h-4 w-4" />
             </span>
             <span className="font-display text-lg font-extrabold tracking-tight text-zinc-950">
               StudySphere
             </span>
           </Link>
 
-          <nav className="hidden xl:flex items-center gap-6 text-sm">
+          {/* Center: Clean Pill Navigation */}
+          <nav className="hidden xl:flex items-center gap-1 text-xs">
             {NAV_LINKS.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
+                end={item.end}
                 onMouseEnter={handlePrefetch(item.to)}
                 onTouchStart={handlePrefetch(item.to)}
                 onFocus={handlePrefetch(item.to)}
                 className={({ isActive }) =>
-                  `transition-colors ${
+                  `rounded-full px-3.5 py-1.5 transition-colors ${
                     isActive
-                      ? 'font-semibold text-teal-700 underline decoration-teal-600 decoration-2 underline-offset-8'
-                      : 'font-medium text-zinc-700 hover:text-zinc-950'
+                      ? 'bg-zinc-100 font-semibold text-zinc-950'
+                      : 'font-medium text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950'
                   }`
                 }
               >
@@ -76,22 +92,33 @@ export default function PublicLayout() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2.5">
-            <Link to="/track" className="hidden sm:inline-flex">
-              <Button variant="secondary" size="sm" className="text-zinc-950 ring-zinc-300">
-                Track Application
-              </Button>
+          {/* Right: Circular Search Icon + Track + Rounded Pill CTA */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search universities or subjects"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-950 transition-colors hover:bg-zinc-200 cursor-pointer"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+            <Link
+              to="/track"
+              className="hidden sm:inline-flex h-9 items-center rounded-full border border-zinc-200 bg-white px-4 text-xs font-semibold text-zinc-950 transition-colors hover:bg-zinc-50"
+            >
+              Track Application
             </Link>
-            <Link to="/apply">
-              <Button size="sm" className="bg-teal-600 text-white hover:bg-teal-700">
-                Book Free Consultation
-              </Button>
+            <Link
+              to="/apply"
+              className="inline-flex h-9 items-center rounded-full bg-teal-600 px-5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-teal-700"
+            >
+              Book Consultation
             </Link>
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-label="Open navigation menu"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-950 hover:bg-zinc-50 xl:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-950 hover:bg-zinc-50 xl:hidden"
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -99,12 +126,33 @@ export default function PublicLayout() {
         </div>
       </header>
 
+      {/* Quick Search Dialog */}
+      <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-zinc-950">Search Universities &amp; Programs</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleQuickSearch} className="flex gap-2">
+            <Input
+              autoFocus
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search subject, university, or city..."
+              className="text-zinc-950"
+            />
+            <Button type="submit" className="bg-teal-600 text-white hover:bg-teal-700">
+              Search
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Responsive Mobile Sheet Drawer */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-80 bg-white p-0">
           <SheetHeader className="border-b border-zinc-200 px-5 py-4 text-left">
             <SheetTitle className="flex items-center gap-2.5 text-zinc-950">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white">
                 <Compass className="h-4 w-4" />
               </span>
               <span className="font-display text-base font-extrabold tracking-tight">StudySphere</span>
@@ -116,13 +164,14 @@ export default function PublicLayout() {
                 <NavLink
                   key={item.to}
                   to={item.to}
+                  end={item.end}
                   onMouseEnter={handlePrefetch(item.to)}
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
-                    `rounded-lg px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                    `rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-teal-50 font-semibold text-teal-700'
-                        : 'text-zinc-950 hover:bg-zinc-100'
+                        ? 'bg-zinc-100 font-semibold text-zinc-950'
+                        : 'text-zinc-950 hover:bg-zinc-50'
                     }`
                   }
                 >
@@ -133,13 +182,13 @@ export default function PublicLayout() {
 
             <div className="space-y-2.5 border-t border-zinc-200 pt-4">
               <Link to="/track" onClick={() => setMobileOpen(false)} className="block">
-                <Button variant="secondary" className="w-full text-zinc-950">
+                <Button variant="secondary" className="w-full rounded-full text-zinc-950">
                   Track Application
                 </Button>
               </Link>
               <Link to="/apply" onClick={() => setMobileOpen(false)} className="block">
-                <Button className="w-full bg-teal-600 text-white hover:bg-teal-700">
-                  Book Free Consultation
+                <Button className="w-full rounded-full bg-teal-600 text-white hover:bg-teal-700">
+                  Book Consultation
                 </Button>
               </Link>
             </div>
@@ -147,7 +196,7 @@ export default function PublicLayout() {
         </SheetContent>
       </Sheet>
 
-      <main className="flex-1">
+      <main className="flex-1 bg-[#F8FAFC]">
         <Outlet />
       </main>
 
@@ -171,7 +220,7 @@ export default function PublicLayout() {
                   to="/admin/login"
                   className="inline-flex items-center gap-1 text-xs font-semibold text-teal-400 hover:text-teal-300"
                 >
-                  Counselor & Admin Portal <ArrowUpRight className="h-3.5 w-3.5" />
+                  Counselor &amp; Admin Portal <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
@@ -208,7 +257,7 @@ export default function PublicLayout() {
                 </li>
                 <li>
                   <Link to="/track" className="transition-colors hover:text-white">
-                    Track & Recover ID
+                    Track &amp; Recover ID
                   </Link>
                 </li>
                 <li>
@@ -235,7 +284,7 @@ export default function PublicLayout() {
                     onMouseEnter={handlePrefetch('/contact')}
                     className="transition-colors hover:text-white"
                   >
-                    Contact & Office Map
+                    Contact &amp; Office Map
                   </Link>
                 </li>
               </ul>
@@ -245,7 +294,7 @@ export default function PublicLayout() {
           {sisterConcerns.length > 0 && (
             <div className="mt-10 border-t border-zinc-800 pt-6">
               <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                Sister Concerns & Partner Ventures
+                Sister Concerns &amp; Partner Ventures
               </div>
               <div className="flex flex-wrap gap-3">
                 {sisterConcerns.map((sc) => (
@@ -265,7 +314,7 @@ export default function PublicLayout() {
           )}
 
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-zinc-800 pt-6 text-xs text-zinc-400">
-            <span>Â© {new Date().getFullYear()} StudySphere. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} StudySphere. All rights reserved.</span>
             <span>
               Reference Prefix: <code className="text-zinc-200">ZRC-YYYY-XXX</code>
             </span>

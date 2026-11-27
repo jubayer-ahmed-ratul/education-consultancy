@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, Award, GraduationCap, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
@@ -25,8 +25,9 @@ interface UniversityListItem {
 
 export default function UniversitiesPage() {
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
-  const [country, setCountry] = useState('');
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [country, setCountry] = useState(searchParams.get('country') || '');
   const [degreeLevel, setDegreeLevel] = useState('');
   const [scholarshipOnly, setScholarshipOnly] = useState(false);
 

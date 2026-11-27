@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion } from 'framer-motion';
@@ -7,18 +7,16 @@ import {
   Award,
   BookOpen,
   Calendar,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   FileCheck2,
   Globe2,
   GraduationCap,
   PlaneTakeoff,
-  ShieldCheck,
-  Sparkles,
+  Search,
   UserCheck,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
@@ -56,8 +54,10 @@ const ADMISSION_STEPS = [
 
 export default function HomePage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data: bundle, isLoading } = usePublicBundle();
   const [selectedUniCountry, setSelectedUniCountry] = useState<string>('all');
+  const [heroSearch, setHeroSearch] = useState('');
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', loop: false });
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
@@ -121,150 +121,113 @@ export default function HomePage() {
     return list.filter((u) => u.country?.name === selectedUniCountry).slice(0, 6);
   }, [universitiesRes?.data, selectedUniCountry]);
 
+  function handleHeroSearch(e: FormEvent) {
+    e.preventDefault();
+    const q = heroSearch.trim();
+    navigate(q ? `/universities?search=${encodeURIComponent(q)}` : '/universities');
+  }
+
+  const heroBgUrl = hero?.slides?.[0]?.imageUrl || '/hero-landmarks.jpg';
+
+  const statsList =
+    bundle?.heroStats && bundle.heroStats.length > 0
+      ? bundle.heroStats
+      : [
+          { order: 1, value: '10,000', suffix: '+', label: 'Programs Listed' },
+          { order: 2, value: '500', suffix: '+', label: 'Partner Universities' },
+          { order: 3, value: '50', suffix: '+', label: 'Countries Covered' },
+          { order: 4, value: '95', suffix: '%', label: 'Student Satisfaction Rate' },
+        ];
+
   return (
     <div className="space-y-20 pb-24">
       <Helmet>
-        <title>StudySphere â€” Global Higher Education Consultancy</title>
+        <title>StudySphere — Global Higher Education Consultancy</title>
         <meta
           name="description"
           content={hero?.description || 'Study abroad admissions, scholarships, and visa guidance.'}
         />
       </Helmet>
 
-      {/* Split Hero Section */}
-      <section className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto max-w-11/12 px-4 py-14 sm:px-6 sm:py-20">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="space-y-6 lg:col-span-7"
-            >
-              <div className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-teal-700 ring-1 ring-inset ring-teal-200">
-                <Sparkles className="h-3.5 w-3.5 text-teal-600" />
-                {hero?.subheading || 'StudySphere Overseas Consultancy'}
-              </div>
+      {/* Panoramic Rounded Hero Banner + Centered 4-Stat Strip */}
+      <section className="bg-white pt-4 pb-8">
+        <div className="mx-auto max-w-11/12 px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-3xl bg-zinc-950 min-h-[440px] sm:min-h-[500px] flex items-center shadow-sm">
+            {/* Background Landmark Photo */}
+            <img
+              src={heroBgUrl}
+              alt={hero?.heading || 'Global study destinations'}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            {/* Dark Left Gradient Overlay for High-Contrast White Text */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0B1120]/90 via-[#0B1120]/55 to-[#0B1120]/15" />
 
-              <h1 className="font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-zinc-950 sm:text-5xl lg:text-[3.25rem]">
-                {hero?.heading || 'Precision Guidance for Global Higher Education'}
-              </h1>
-
-              <p className="max-w-2xl text-base leading-relaxed text-zinc-700 sm:text-lg">
-                {hero?.description ||
-                  'From university shortlisting and scholarship strategy to visa filing, we guide ambitious students into leading institutions worldwide.'}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Link to="/apply">
-                  <Button size="lg" className="bg-teal-600 text-white hover:bg-teal-700">
-                    Book Free Consultation <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link to="/track">
-                  <Button variant="secondary" size="lg" className="text-zinc-950 ring-zinc-300">
-                    Track Application
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 text-xs font-medium text-zinc-700">
-                <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-teal-600" /> Verified Offer & Visa Support
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <ShieldCheck className="h-4 w-4 text-teal-600" /> Live ZRC-YYYY-XXX Case Tracking
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Right-Side Hero Visual / Snapshot */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="lg:col-span-5"
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              className="relative z-10 w-full max-w-2xl space-y-5 px-6 py-14 sm:px-12 lg:px-14"
             >
-              {hero?.slides?.[0]?.imageUrl ? (
-                <div className="overflow-hidden rounded-2xl bg-[#F8FAFC] ring-1 ring-zinc-950/10 shadow-sm">
-                  <img
-                    src={hero.slides[0].imageUrl}
-                    alt={hero.slides[0].title || hero.heading || 'Global Higher Education'}
-                    className="aspect-[4/3] w-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="rounded-2xl bg-[#F8FAFC] p-6 ring-1 ring-zinc-950/10 space-y-5">
-                  <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
-                        Admissions Desk
-                      </div>
-                      <div className="mt-0.5 font-display text-lg font-bold text-zinc-950">
-                        2026 / 2027 Intakes Open
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700 ring-1 ring-teal-200">
-                      Live
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-xl bg-white p-4 ring-1 ring-zinc-950/10">
-                      <div className="text-xs font-medium text-zinc-600">Destinations</div>
-                      <div className="mt-1 text-2xl font-extrabold tabular-nums text-zinc-950">
-                        {countriesRes?.data.length ? `${countriesRes.data.length}+` : '10+'}
-                      </div>
-                    </div>
-                    <div className="rounded-xl bg-white p-4 ring-1 ring-zinc-950/10">
-                      <div className="text-xs font-medium text-zinc-600">Partner Campuses</div>
-                      <div className="mt-1 text-2xl font-extrabold tabular-nums text-zinc-950">
-                        {universitiesRes?.data.length ? `${universitiesRes.data.length}+` : '50+'}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="rounded-xl bg-white p-4 ring-1 ring-zinc-950/10 space-y-2">
-                    <div className="text-xs font-semibold text-zinc-950">Included in Free Consultation</div>
-                    <ul className="space-y-1.5 text-xs text-zinc-700">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                        Personalized country & university shortlist
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                        Scholarship & tuition budget assessment
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                        Instant reference ID for live status tracking
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              )}
+              {/* Frosted Badge Pill */}
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 p-1 pr-4 backdrop-blur-md ring-1 ring-white/20">
+                <span className="rounded-full bg-teal-600 px-2.5 py-0.5 text-xs font-bold text-white">
+                  500+
+                </span>
+                <span className="text-xs font-medium text-white/95">
+                  {hero?.subheading || 'Partner Universities Worldwide'}
+                </span>
+              </div>
+
+              <h1 className="font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
+                {hero?.heading || 'Find Your Perfect University Abroad'}
+              </h1>
+
+              <p className="max-w-lg text-sm leading-relaxed text-white/90 sm:text-base">
+                {hero?.description ||
+                  'Guided by your background, matched to your goals — from shortlisting and scholarships to student visa approval.'}
+              </p>
+
+              {/* Signature White Pill Search Bar */}
+              <form
+                onSubmit={handleHeroSearch}
+                className="flex max-w-md items-center rounded-full bg-white p-1.5 shadow-xl"
+              >
+                <input
+                  type="text"
+                  value={heroSearch}
+                  onChange={(e) => setHeroSearch(e.target.value)}
+                  placeholder="Search your desired subject..."
+                  className="min-w-0 flex-1 bg-transparent px-4 py-2 text-sm text-zinc-950 placeholder:text-zinc-500 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2 rounded-full bg-teal-600 py-1.5 pl-2 pr-4 text-xs font-semibold text-white transition-colors hover:bg-teal-700 cursor-pointer shrink-0"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-950 text-white">
+                    <Search className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Search</span>
+                </button>
+              </form>
             </motion.div>
+          </div>
+
+          {/* Centered 4-Stat Strip Directly Below Hero */}
+          <div className="mt-4 rounded-2xl bg-[#EEF2F6] px-6 py-7 sm:px-10">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {statsList.map((stat) => (
+                <div key={stat.order} className="text-center">
+                  <div className="font-display text-3xl font-extrabold tabular-nums text-zinc-950 sm:text-4xl">
+                    {stat.value}
+                    <span className="text-teal-600">{stat.suffix}</span>
+                  </div>
+                  <div className="mt-1 text-xs font-medium text-zinc-700">{stat.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
-
-      {/* Live Trust Stats Bar */}
-      {bundle?.heroStats && bundle.heroStats.length > 0 && (
-        <section className="mx-auto -mt-12 max-w-11/12 px-4 sm:px-6">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {bundle.heroStats.map((stat) => (
-              <div
-                key={stat.order}
-                className="rounded-xl bg-white p-5 ring-1 ring-zinc-950/10 shadow-xs transition-colors hover:ring-teal-600/30"
-              >
-                <div className="font-mono text-2xl font-extrabold tabular-nums text-zinc-950 sm:text-3xl">
-                  {stat.value}
-                  <span className="text-teal-600">{stat.suffix}</span>
-                </div>
-                <div className="mt-1 text-xs font-medium text-zinc-700">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Top Study Destinations */}
       <section className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
@@ -314,7 +277,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center justify-between border-t border-zinc-200 pt-3 text-xs">
                   <span className="font-medium text-zinc-600">
-                    {c.intakes.length > 0 ? `Intakes: ${c.intakes.slice(0, 2).join(' â€¢ ')}` : 'Multiple intakes'}
+                    {c.intakes.length > 0 ? `Intakes: ${c.intakes.slice(0, 2).join(' • ')}` : 'Multiple intakes'}
                   </span>
                   <span className="inline-flex items-center gap-1 font-semibold text-teal-700">
                     Guide <ArrowRight className="h-3.5 w-3.5" />
@@ -407,7 +370,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works â€” 4-Step Admission Process */}
+      {/* How It Works — 4-Step Admission Process */}
       <section className="border-y border-zinc-200 bg-white py-16">
         <div className="mx-auto max-w-11/12 space-y-10 px-4 sm:px-6">
           <div className="max-w-2xl space-y-2">
@@ -500,14 +463,14 @@ export default function HomePage() {
                   </div>
                   <div className="font-display text-base font-bold text-zinc-950">{s.name}</div>
                   <div className="text-xs font-semibold text-teal-700">
-                    {s.program} â€” {s.university}
+                    {s.program} — {s.university}
                   </div>
                   {s.achievement && (
                     <Badge variant="success" className="bg-teal-50 text-teal-700 border-teal-200">
                       {s.achievement}
                     </Badge>
                   )}
-                  <p className="text-xs leading-relaxed text-zinc-700 line-clamp-4">â€œ{s.testimonial}â€</p>
+                  <p className="text-xs leading-relaxed text-zinc-700 line-clamp-4">“{s.testimonial}”</p>
                 </div>
               ))}
             </div>
@@ -520,7 +483,7 @@ export default function HomePage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
             <h2 className="flex items-center gap-2 font-display text-xl font-bold text-zinc-950">
-              <BookOpen className="h-4.5 w-4.5 text-teal-600" /> Study Guides & Blogs
+              <BookOpen className="h-4.5 w-4.5 text-teal-600" /> Study Guides &amp; Blogs
             </h2>
             <Link to="/blogs" className="text-xs font-semibold text-teal-700 hover:underline">
               All Blogs
@@ -566,7 +529,7 @@ export default function HomePage() {
                 className="block rounded-xl bg-white p-4 ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40"
               >
                 <div className="font-mono text-[11px] font-semibold text-teal-700">
-                  {new Date(ev.eventDate).toLocaleDateString()} â€¢ {ev.venue}
+                  {new Date(ev.eventDate).toLocaleDateString()} • {ev.venue}
                 </div>
                 <div className="mt-1 font-display font-bold text-zinc-950">{ev.title}</div>
                 <p className="mt-1 text-xs text-zinc-700 line-clamp-2">{ev.shortDescription}</p>
@@ -596,15 +559,15 @@ export default function HomePage() {
             </div>
             <div className="flex flex-wrap gap-3 shrink-0">
               <Link to={about?.buttonLink || '/apply'}>
-                <Button size="lg" className="bg-teal-600 text-white hover:bg-teal-500">
-                  {about?.buttonText || 'Book Free Consultation'} <ArrowRight className="h-4 w-4" />
+                <Button size="lg" className="rounded-full bg-teal-600 text-white hover:bg-teal-500">
+                  {about?.buttonText || 'Book Consultation'} <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link to="/track">
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="bg-zinc-900 text-white ring-zinc-700 hover:bg-zinc-800"
+                  className="rounded-full bg-zinc-900 text-white ring-zinc-700 hover:bg-zinc-800"
                 >
                   Track Application
                 </Button>
