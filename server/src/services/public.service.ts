@@ -249,6 +249,7 @@ export const publicService = {
           title: true,
           slug: true,
           shortDescription: true,
+          eventBanner: true,
           eventDate: true,
           startTime: true,
           endTime: true,

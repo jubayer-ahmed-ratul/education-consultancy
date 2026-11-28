@@ -40,6 +40,18 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
     queryFn: () => apiRequest<Array<Record<string, unknown>>>(endpoint),
   });
 
+  const invalidateCmsAndPublic = () => {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.cms.section(kind) });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.cms.publicBundle });
+    if (kind === 'blogs') {
+      void queryClient.invalidateQueries({ queryKey: ['public-blogs'] });
+      void queryClient.invalidateQueries({ queryKey: ['public-blog'] });
+    } else if (kind === 'events') {
+      void queryClient.invalidateQueries({ queryKey: ['public-events'] });
+      void queryClient.invalidateQueries({ queryKey: ['public-event'] });
+    }
+  };
+
   const saveMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
       editingId
@@ -50,7 +62,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
       setSheetOpen(false);
       setEditingId(null);
       setFormState({});
-      void queryClient.invalidateQueries({ queryKey: queryKeys.cms.section(kind) });
+      invalidateCmsAndPublic();
     },
     onError: (err) => addToast('error', err instanceof Error ? err.message : 'Save failed.'),
   });
@@ -60,7 +72,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
       apiRequest(`${endpoint}/${id}`, { method: 'PUT', body: JSON.stringify({ isPublished }) }),
     onSuccess: () => {
       addToast('success', 'Visibility updated.');
-      void queryClient.invalidateQueries({ queryKey: queryKeys.cms.section(kind) });
+      invalidateCmsAndPublic();
     },
   });
 
@@ -69,7 +81,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
     onSuccess: () => {
       addToast('success', 'Deleted successfully.');
       setDeleteTarget(null);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.cms.section(kind) });
+      invalidateCmsAndPublic();
     },
     onError: (err) => addToast('error', err instanceof Error ? err.message : 'Delete failed.'),
   });
@@ -82,7 +94,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
       }),
     onSuccess: () => {
       addToast('success', 'Stories reordered.');
-      void queryClient.invalidateQueries({ queryKey: queryKeys.cms.section(kind) });
+      invalidateCmsAndPublic();
     },
   });
 
@@ -94,6 +106,28 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
   function boolVal(key: string, fallback = false): boolean {
     const v = formState[key];
     return typeof v === 'boolean' ? v : fallback;
+  }
+
+  function imageMetaUrl(key: string): string {
+    const v = formState[key];
+    if (typeof v === 'string') return v;
+    if (v && typeof v === 'object') {
+      const obj = v as { secureUrl?: string; url?: string };
+      return obj.secureUrl || obj.url || '';
+    }
+    return '';
+  }
+
+  function setImageMeta(key: string, url: string) {
+    const trimmed = url.trim();
+    if (!trimmed) {
+      setField(key, null);
+      return;
+    }
+    setField(key, {
+      publicId: `studysphere/${kind}/${Date.now()}`,
+      secureUrl: trimmed,
+    });
   }
 
   function setField(key: string, value: unknown) {
@@ -258,6 +292,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
                     <Input placeholder="Category" value={val('category', 'Study Abroad Guide')} onChange={(e) => setField('category', e.target.value)} />
                     <Input placeholder="Author" value={val('author', 'StudySphere Editorial Desk')} onChange={(e) => setField('author', e.target.value)} />
                   </div>
+                  <ImageUploadField label="Cover Image" value={imageMetaUrl('featuredImage')} onChange={(u) => setImageMeta('featuredImage', u)} purpose="blog-featured" />
                   <Input required placeholder="Excerpt *" value={val('excerpt')} onChange={(e) => setField('excerpt', e.target.value)} />
                   <Textarea required rows={6} placeholder="Full Content *" value={val('content')} onChange={(e) => setField('content', e.target.value)} />
                 </>
@@ -276,6 +311,7 @@ export default function CmsCollectionsPage({ kind }: { kind: CmsCollectionKind }
                   </div>
                   <Input required placeholder="Venue *" value={val('venue')} onChange={(e) => setField('venue', e.target.value)} />
                   <Input type="url" placeholder="Registration URL" value={val('registrationUrl')} onChange={(e) => setField('registrationUrl', e.target.value || null)} />
+                  <ImageUploadField label="Event Banner" value={imageMetaUrl('eventBanner')} onChange={(u) => setImageMeta('eventBanner', u)} purpose="event-banner" />
                   <Input required placeholder="Short Description *" value={val('shortDescription')} onChange={(e) => setField('shortDescription', e.target.value)} />
                   <Textarea required rows={4} placeholder="Full Description *" value={val('fullDescription')} onChange={(e) => setField('fullDescription', e.target.value)} />
                 </>

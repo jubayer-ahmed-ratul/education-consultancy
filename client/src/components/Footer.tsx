@@ -1,8 +1,10 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Compass, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { PublicBundleData } from '../hooks/usePublicBundle';
+import { apiRequest } from '../lib/api-client';
 import { prefetchRoute } from '../lib/prefetch';
+import { queryKeys } from '../lib/query-keys';
 
 interface FooterProps {
   bundle?: PublicBundleData;
@@ -13,6 +15,23 @@ export function Footer({ bundle, waHref }: FooterProps) {
   const queryClient = useQueryClient();
   const footer = bundle?.footerSetting;
   const sisterConcerns = bundle?.sisterConcerns ?? [];
+
+  const { data: countriesRes } = useQuery({
+    queryKey: queryKeys.countries.publicList({ page: 1, limit: 100 }),
+    queryFn: () =>
+      apiRequest<Array<{ id: string; name: string; slug: string }>>('/countries?page=1&limit=100'),
+    enabled: !(footer?.featuredCountrySlugs?.length),
+  });
+
+  const destinationLinks = footer?.featuredCountrySlugs?.length
+    ? footer.featuredCountrySlugs.map((slug) => ({
+        slug,
+        label: slug.replace(/-/g, ' '),
+      }))
+    : (countriesRes?.data ?? []).slice(0, 5).map((c) => ({
+        slug: c.slug,
+        label: c.name,
+      }));
 
   const handlePrefetch = (to: string) => () => {
     void prefetchRoute(queryClient, to);
@@ -112,18 +131,15 @@ export function Footer({ bundle, waHref }: FooterProps) {
               Top Destinations
             </div>
             <ul className="space-y-2.5 text-sm text-zinc-300">
-              {(footer?.featuredCountrySlugs?.length
-                ? footer.featuredCountrySlugs
-                : ['united-kingdom', 'canada', 'australia', 'united-states', 'germany']
-              ).map((slug) => (
-                <li key={slug}>
+              {destinationLinks.map((dest) => (
+                <li key={dest.slug}>
                   <Link
-                    to={`/countries/${slug}`}
-                    onMouseEnter={handlePrefetch(`/countries/${slug}`)}
-                    onFocus={handlePrefetch(`/countries/${slug}`)}
+                    to={`/countries/${dest.slug}`}
+                    onMouseEnter={handlePrefetch(`/countries/${dest.slug}`)}
+                    onFocus={handlePrefetch(`/countries/${dest.slug}`)}
                     className="capitalize transition-colors hover:text-white"
                   >
-                    {slug.replace(/-/g, ' ')}
+                    {dest.label}
                   </Link>
                 </li>
               ))}

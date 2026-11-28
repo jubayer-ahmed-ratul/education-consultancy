@@ -7,6 +7,29 @@ import { Input } from '../../components/ui/input';
 import { apiRequest } from '../../lib/api-client';
 import { prefetchBlog } from '../../lib/prefetch';
 
+export interface BlogImageMeta {
+  publicId?: string;
+  secureUrl?: string;
+  url?: string;
+}
+
+export interface PublicBlogItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  category: string;
+  author: string;
+  publishedAt: string | null;
+  featuredImage?: BlogImageMeta | string | null;
+}
+
+export function resolveCmsImage(img?: BlogImageMeta | string | null): string | null {
+  if (!img) return null;
+  if (typeof img === 'string') return img;
+  return img.secureUrl || img.url || null;
+}
+
 export default function BlogsPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
@@ -16,24 +39,13 @@ export default function BlogsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['public-blogs', search],
     placeholderData: keepPreviousData,
-    queryFn: () =>
-      apiRequest<
-        Array<{
-          id: string;
-          title: string;
-          slug: string;
-          excerpt: string;
-          category: string;
-          author: string;
-          publishedAt: string | null;
-        }>
-      >(`/blogs?${params.toString()}`),
+    queryFn: () => apiRequest<PublicBlogItem[]>(`/blogs?${params.toString()}`),
   });
 
   return (
-    <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
       <Helmet>
-        <title>Blogs & Study Guides â€” StudySphere</title>
+        <title>Blogs &amp; Study Guides — StudySphere</title>
       </Helmet>
 
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-6">
@@ -42,7 +54,7 @@ export default function BlogsPage() {
             <BookOpen className="h-3.5 w-3.5" /> Editorial Desk
           </span>
           <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-zinc-950">
-            Blogs & Study Guides
+            Blogs &amp; Study Guides
           </h1>
         </div>
         <div className="relative w-full sm:w-72">
@@ -58,40 +70,59 @@ export default function BlogsPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-44 animate-pulse rounded-xl bg-zinc-200/70" />
+            <div key={i} className="h-80 animate-pulse rounded-2xl bg-zinc-200/70" />
           ))}
         </div>
       ) : !data?.data.length ? (
-        <div className="rounded-xl bg-white p-10 text-center text-sm text-zinc-600 ring-1 ring-zinc-950/10">
+        <div className="rounded-2xl bg-white p-10 text-center text-sm text-zinc-600 ring-1 ring-zinc-950/10">
           No articles matched your search.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {data.data.map((b) => (
-            <Link
-              key={b.id}
-              to={`/blogs/${b.slug}`}
-              onMouseEnter={() => void prefetchBlog(queryClient, b.slug)}
-              onTouchStart={() => void prefetchBlog(queryClient, b.slug)}
-              onFocus={() => void prefetchBlog(queryClient, b.slug)}
-              className="group flex flex-col justify-between space-y-4 rounded-xl bg-white p-5 ring-1 ring-zinc-950/10 transition-all hover:ring-teal-600/40 hover:shadow-sm"
-            >
-              <div className="space-y-2">
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-teal-700">
-                  {b.category}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {data.data.map((b) => {
+            const coverUrl = resolveCmsImage(b.featuredImage);
+            return (
+              <Link
+                key={b.id}
+                to={`/blogs/${b.slug}`}
+                onMouseEnter={() => void prefetchBlog(queryClient, b.slug)}
+                onTouchStart={() => void prefetchBlog(queryClient, b.slug)}
+                onFocus={() => void prefetchBlog(queryClient, b.slug)}
+                className="group flex flex-col justify-between overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-950/10 transition-all hover:shadow-md hover:ring-teal-600/40"
+              >
+                <div>
+                  <div className="aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-[#09090B] via-[#0B1F3A] to-[#0D9488]">
+                    {coverUrl ? (
+                      <img
+                        src={coverUrl}
+                        alt={b.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-teal-300/60">
+                        <BookOpen className="h-10 w-10" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2 p-5">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-teal-700">
+                      {b.category}
+                    </div>
+                    <h2 className="font-display text-lg font-bold text-zinc-950 group-hover:text-teal-700">
+                      {b.title}
+                    </h2>
+                    <p className="line-clamp-3 text-sm text-zinc-700">{b.excerpt}</p>
+                  </div>
                 </div>
-                <h2 className="font-display text-lg font-bold text-zinc-950 group-hover:text-teal-700">
-                  {b.title}
-                </h2>
-                <p className="text-sm text-zinc-700 line-clamp-3">{b.excerpt}</p>
-              </div>
-              <div className="border-t border-zinc-200 pt-3 text-xs font-medium text-zinc-600">
-                {b.author}
-              </div>
-            </Link>
-          ))}
+                <div className="border-t border-zinc-100 px-5 py-3 text-xs font-medium text-zinc-600">
+                  {b.author}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

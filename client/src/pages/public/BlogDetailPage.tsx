@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { apiRequest } from '../../lib/api-client';
+import { resolveCmsImage, type BlogImageMeta, type PublicBlogItem } from './BlogsPage';
 
 interface BlogDetail {
   id: string;
@@ -13,30 +14,52 @@ interface BlogDetail {
   category: string;
   author: string;
   publishedAt: string | null;
+  featuredImage?: BlogImageMeta | string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
 }
 
 export default function BlogDetailPage() {
   const { slug = '' } = useParams();
+  const queryClient = useQueryClient();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['public-blog', slug],
     queryFn: () => apiRequest<BlogDetail>(`/blogs/${slug}`),
+    placeholderData: () => {
+      if (!slug) return undefined;
+      const lists = queryClient.getQueriesData<{ data?: PublicBlogItem[] }>({
+        queryKey: ['public-blogs'],
+      });
+      for (const [, cached] of lists) {
+        const match = cached?.data?.find((item) => item.slug === slug);
+        if (match) {
+          return {
+            success: true as const,
+            data: {
+              ...match,
+              content: '',
+            },
+          };
+        }
+      }
+      return undefined;
+    },
     enabled: Boolean(slug),
   });
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-11/12 space-y-4 px-4 py-10">
+      <div className="mx-auto max-w-5xl space-y-4 px-4 pt-28 pb-16 sm:px-6">
         <div className="h-8 w-56 animate-pulse rounded bg-zinc-200/70" />
-        <div className="h-60 animate-pulse rounded-xl bg-zinc-200/70" />
+        <div className="h-72 animate-pulse rounded-2xl bg-zinc-200/70" />
       </div>
     );
   }
 
   if (error || !data?.data) {
     return (
-      <div className="mx-auto max-w-11/12 space-y-3 px-4 py-12 text-center">
+      <div className="mx-auto max-w-5xl space-y-3 px-4 pt-28 pb-16 text-center">
         <p className="text-sm font-medium text-rose-700">Article not found.</p>
         <Link to="/blogs" className="text-sm font-semibold text-teal-700 underline">
           Back to Blogs
@@ -46,10 +69,12 @@ export default function BlogDetailPage() {
   }
 
   const b = data.data;
+  const coverUrl = resolveCmsImage(b.featuredImage);
+
   return (
-    <article className="mx-auto max-w-11/12 space-y-6 px-4 py-10 sm:px-6">
+    <article className="mx-auto max-w-5xl space-y-6 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
       <Helmet>
-        <title>{b.seoTitle || b.title} â€” StudySphere</title>
+        <title>{b.seoTitle || b.title} — StudySphere</title>
         <meta name="description" content={b.seoDescription || b.excerpt} />
       </Helmet>
 
@@ -60,16 +85,25 @@ export default function BlogDetailPage() {
         <ArrowLeft className="h-3.5 w-3.5" /> Back to Blogs
       </Link>
 
-      <div className="space-y-5 rounded-xl bg-white p-6 ring-1 ring-zinc-950/10 sm:p-10">
-        <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
-          {b.category} â€¢ {b.author}
-        </div>
-        <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-zinc-950">
-          {b.title}
-        </h1>
-        <p className="text-base leading-relaxed text-zinc-700">{b.excerpt}</p>
-        <div className="whitespace-pre-wrap border-t border-zinc-200 pt-6 text-sm leading-relaxed text-zinc-950">
-          {b.content}
+      <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-950/10">
+        {coverUrl && (
+          <div className="aspect-[21/9] w-full overflow-hidden bg-zinc-100">
+            <img src={coverUrl} alt={b.title} className="h-full w-full object-cover" />
+          </div>
+        )}
+        <div className="space-y-5 p-6 sm:p-10">
+          <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
+            {b.category} • {b.author}
+          </div>
+          <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-zinc-950">
+            {b.title}
+          </h1>
+          <p className="text-base leading-relaxed text-zinc-700">{b.excerpt}</p>
+          {b.content && (
+            <div className="whitespace-pre-wrap border-t border-zinc-200 pt-6 text-sm leading-relaxed text-zinc-950">
+              {b.content}
+            </div>
+          )}
         </div>
       </div>
     </article>
