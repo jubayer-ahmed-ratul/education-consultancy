@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -20,6 +20,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { useToast } from '../../context/ToastContext';
 import { apiRequest } from '../../lib/api-client';
 import { prefetchDestination, prefetchUniversitiesList } from '../../lib/prefetch';
+import { queryKeys } from '../../lib/query-keys';
 
 interface UniversityDetail {
   id: string;
@@ -40,6 +41,87 @@ interface UniversityDetail {
   country: { id: string; name: string; slug: string };
 }
 
+function findCachedUniversity(
+  queryClient: QueryClient,
+  slug: string,
+): { success: true; data: UniversityDetail } | undefined {
+  if (!slug) return undefined;
+
+  const listQueries = queryClient.getQueriesData<{
+    data?: Array<Partial<UniversityDetail>>;
+  }>({ queryKey: queryKeys.universities.all });
+
+  for (const [, cached] of listQueries) {
+    const match = cached?.data?.find((u) => u.slug === slug);
+    if (match && match.name && match.country) {
+      return {
+        success: true,
+        data: {
+          id: match.id ?? slug,
+          name: match.name,
+          slug: match.slug ?? slug,
+          countryId: match.countryId ?? match.country.id ?? '',
+          city: match.city ?? null,
+          logoUrl: match.logoUrl ?? null,
+          imageUrl: match.imageUrl ?? null,
+          description: match.description ?? '',
+          programs: match.programs ?? [],
+          admissionRequirements: match.admissionRequirements ?? null,
+          englishRequirements: match.englishRequirements ?? null,
+          scholarshipDetails: match.scholarshipDetails ?? null,
+          applicationDeadlines: match.applicationDeadlines ?? null,
+          website: match.website ?? null,
+          tuitionRange: match.tuitionRange ?? null,
+          country: match.country,
+        },
+      };
+    }
+  }
+
+  const countryQueries = queryClient.getQueriesData<{
+    data?: {
+      id?: string;
+      name?: string;
+      slug?: string;
+      universities?: Array<Partial<UniversityDetail>>;
+    };
+  }>({ queryKey: ['public-country'] });
+
+  for (const [, cached] of countryQueries) {
+    const countryData = cached?.data;
+    const match = countryData?.universities?.find((u) => u.slug === slug);
+    if (match && match.name && countryData?.name && countryData?.slug) {
+      return {
+        success: true,
+        data: {
+          id: match.id ?? slug,
+          name: match.name,
+          slug: match.slug ?? slug,
+          countryId: match.countryId ?? countryData.id ?? '',
+          city: match.city ?? null,
+          logoUrl: match.logoUrl ?? null,
+          imageUrl: match.imageUrl ?? null,
+          description: match.description ?? '',
+          programs: match.programs ?? [],
+          admissionRequirements: match.admissionRequirements ?? null,
+          englishRequirements: match.englishRequirements ?? null,
+          scholarshipDetails: match.scholarshipDetails ?? null,
+          applicationDeadlines: match.applicationDeadlines ?? null,
+          website: match.website ?? null,
+          tuitionRange: match.tuitionRange ?? null,
+          country: {
+            id: countryData.id ?? '',
+            name: countryData.name,
+            slug: countryData.slug,
+          },
+        },
+      };
+    }
+  }
+
+  return undefined;
+}
+
 export default function UniversityDetailPage() {
   const { slug = '' } = useParams();
   const queryClient = useQueryClient();
@@ -54,6 +136,7 @@ export default function UniversityDetailPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['public-university', slug],
     queryFn: () => apiRequest<UniversityDetail>(`/universities/${slug}`),
+    placeholderData: () => findCachedUniversity(queryClient, slug),
     enabled: Boolean(slug),
   });
 

@@ -28,12 +28,12 @@ export default function App() {
     const warmUp = () => {
       void prefetchPublicBundle(queryClient);
       void queryClient.prefetchQuery({
-        queryKey: queryKeys.countries.publicList({ page: 1, limit: 6 }),
-        queryFn: () => apiRequest('/countries?page=1&limit=6'),
+        queryKey: queryKeys.countries.publicList({ page: 1, limit: 100 }),
+        queryFn: () => apiRequest('/countries?page=1&limit=100'),
       });
       void queryClient.prefetchQuery({
-        queryKey: queryKeys.universities.publicList({ page: 1, limit: 6 }),
-        queryFn: () => apiRequest('/universities?page=1&limit=6'),
+        queryKey: queryKeys.universities.publicList({ page: 1, limit: 100 }),
+        queryFn: () => apiRequest('/universities?page=1&limit=100'),
       });
     };
 
