@@ -11,7 +11,7 @@ export default function SuccessStoriesPage() {
   const stories = bundle?.successStories ?? [];
 
   return (
-    <div className="mx-auto max-w-11/12 space-y-10 px-4 py-10 sm:px-6">
+    <div className="mx-auto w-11/12 max-w-[1440px] space-y-10 px-4 py-10 sm:px-6">
       <Helmet>
         <title>{settings?.seoTitle || settings?.heroHeading || 'Success Stories'} â€” StudySphere</title>
         {settings?.seoDescription && <meta name="description" content={settings.seoDescription} />}

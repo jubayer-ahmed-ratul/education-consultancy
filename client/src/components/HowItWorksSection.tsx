@@ -65,7 +65,7 @@ const STEPS: StepItem[] = [
 export function HowItWorksSection() {
   return (
     <section className="border-y border-zinc-200 bg-white py-16 sm:py-20">
-      <div className="mx-auto max-w-11/12 space-y-12 px-4 sm:px-6">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-12 px-4 sm:px-6">
         {/* Section Header */}
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl space-y-2">

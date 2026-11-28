@@ -3,7 +3,12 @@ import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { apiRequest } from '../../lib/api-client';
-import { resolveCmsImage, type BlogImageMeta, type PublicBlogItem } from './BlogsPage';
+import {
+  DEFAULT_BLOG_IMAGE,
+  resolveMediaUrl,
+  type CmsImageField,
+} from '../../lib/cms-image';
+import type { PublicBlogItem } from './BlogsPage';
 
 interface BlogDetail {
   id: string;
@@ -14,7 +19,10 @@ interface BlogDetail {
   category: string;
   author: string;
   publishedAt: string | null;
-  featuredImage?: BlogImageMeta | string | null;
+  featuredImage?: CmsImageField;
+  coverImage?: CmsImageField;
+  imageUrl?: CmsImageField;
+  image?: CmsImageField;
   seoTitle?: string | null;
   seoDescription?: string | null;
 }
@@ -50,7 +58,7 @@ export default function BlogDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4 px-4 pt-28 pb-16 sm:px-6">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-4 pt-28 pb-16">
         <div className="h-8 w-56 animate-pulse rounded bg-zinc-200/70" />
         <div className="h-72 animate-pulse rounded-2xl bg-zinc-200/70" />
       </div>
@@ -59,7 +67,7 @@ export default function BlogDetailPage() {
 
   if (error || !data?.data) {
     return (
-      <div className="mx-auto max-w-5xl space-y-3 px-4 pt-28 pb-16 text-center">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-3 pt-28 pb-16 text-center">
         <p className="text-sm font-medium text-rose-700">Article not found.</p>
         <Link to="/blogs" className="text-sm font-semibold text-teal-700 underline">
           Back to Blogs
@@ -69,10 +77,10 @@ export default function BlogDetailPage() {
   }
 
   const b = data.data;
-  const coverUrl = resolveCmsImage(b.featuredImage);
+  const coverUrl = resolveMediaUrl(b, DEFAULT_BLOG_IMAGE);
 
   return (
-    <article className="mx-auto max-w-5xl space-y-6 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+    <article className="mx-auto w-11/12 max-w-[1440px] space-y-6 pt-28 pb-16">
       <Helmet>
         <title>{b.seoTitle || b.title} — StudySphere</title>
         <meta name="description" content={b.seoDescription || b.excerpt} />
@@ -86,11 +94,18 @@ export default function BlogDetailPage() {
       </Link>
 
       <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-950/10">
-        {coverUrl && (
-          <div className="aspect-[21/9] w-full overflow-hidden bg-zinc-100">
-            <img src={coverUrl} alt={b.title} className="h-full w-full object-cover" />
-          </div>
-        )}
+        <div className="aspect-[21/9] max-h-[420px] w-full overflow-hidden bg-zinc-100">
+          <img
+            src={coverUrl}
+            alt={b.title}
+            onError={(e) => {
+              if (e.currentTarget.src !== DEFAULT_BLOG_IMAGE) {
+                e.currentTarget.src = DEFAULT_BLOG_IMAGE;
+              }
+            }}
+            className="h-full w-full object-cover"
+          />
+        </div>
         <div className="space-y-5 p-6 sm:p-10">
           <div className="text-xs font-semibold uppercase tracking-wider text-teal-700">
             {b.category} • {b.author}

@@ -96,7 +96,7 @@ export default function TrackPage() {
   }
 
   return (
-    <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
+    <div className="mx-auto w-11/12 max-w-[1440px] space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
         <title>Track Application â€” StudySphere</title>
       </Helmet>

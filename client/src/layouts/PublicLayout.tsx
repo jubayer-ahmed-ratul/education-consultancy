@@ -79,13 +79,13 @@ export default function PublicLayout() {
       <header
         className={`fixed left-1/2 z-50 -translate-x-1/2 transition-all duration-300 ease-out ${
           isScrolled
-            ? 'top-3 w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)] max-w-7xl rounded-2xl bg-white/90 px-4 sm:px-6 py-2.5 shadow-lg shadow-zinc-950/5 ring-1 ring-zinc-950/10 backdrop-blur-md'
+            ? 'top-3 w-11/12 max-w-[1440px] rounded-2xl bg-white/90 px-4 sm:px-6 py-2.5 shadow-lg shadow-zinc-950/5 ring-1 ring-zinc-950/10 backdrop-blur-md'
             : 'top-0 w-full rounded-none border-b border-zinc-200/70 bg-white/95 py-4 backdrop-blur-md'
         }`}
       >
         <div
           className={`mx-auto flex items-center justify-between gap-4 ${
-            isScrolled ? 'w-full' : 'max-w-7xl px-4 sm:px-6 lg:px-8'
+            isScrolled ? 'w-full' : 'w-11/12 max-w-[1440px]'
           }`}
         >
           {/* Left: Brand Wordmark */}

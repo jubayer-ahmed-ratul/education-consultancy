@@ -84,7 +84,7 @@ export default function DestinationsPage() {
           }}
         />
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-10 pt-28 sm:px-6 lg:px-8 space-y-6">
+        <div className="relative z-10 mx-auto w-11/12 max-w-[1440px] space-y-6 pb-10 pt-28">
           <div>
             <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-teal-300">
               <Globe2 className="h-3.5 w-3.5" /> Global Study Destinations
@@ -131,7 +131,7 @@ export default function DestinationsPage() {
       </section>
 
       {/* Full-Bleed Country Cards Grid */}
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto w-11/12 max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
         {isLoading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (

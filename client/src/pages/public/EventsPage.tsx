@@ -6,15 +6,23 @@ import { Helmet } from 'react-helmet-async';
 import { Badge } from '../../components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { apiRequest } from '../../lib/api-client';
+import {
+  DEFAULT_EVENT_IMAGE,
+  resolveMediaUrl,
+  type CmsImageField,
+} from '../../lib/cms-image';
 import { prefetchEvent } from '../../lib/prefetch';
-import { resolveCmsImage, type BlogImageMeta } from './BlogsPage';
 
 export interface PublicEventItem {
   id: string;
   title: string;
   slug: string;
   shortDescription: string;
-  eventBanner?: BlogImageMeta | string | null;
+  eventBanner?: CmsImageField;
+  coverImage?: CmsImageField;
+  imageUrl?: CmsImageField;
+  image?: CmsImageField;
+  bannerImage?: CmsImageField;
   eventDate: string;
   startTime?: string;
   endTime?: string;
@@ -33,7 +41,7 @@ export default function EventsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+    <div className="mx-auto w-11/12 max-w-[1440px] space-y-8 pt-28 pb-16">
       <Helmet>
         <title>Events &amp; Fairs — StudySphere</title>
       </Helmet>
@@ -69,7 +77,7 @@ export default function EventsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {data.data.map((ev) => {
-            const bannerUrl = resolveCmsImage(ev.eventBanner);
+            const bannerUrl = resolveMediaUrl(ev, DEFAULT_EVENT_IMAGE);
             return (
               <Link
                 key={ev.id}
@@ -79,19 +87,18 @@ export default function EventsPage() {
                 onFocus={() => void prefetchEvent(queryClient, ev.slug)}
                 className="group overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-950/10 transition-all hover:shadow-md hover:ring-teal-600/40"
               >
-                <div className="aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-[#09090B] via-[#0B1F3A] to-[#0D9488]">
-                  {bannerUrl ? (
-                    <img
-                      src={bannerUrl}
-                      alt={ev.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-teal-300/60">
-                      <Calendar className="h-10 w-10" />
-                    </div>
-                  )}
+                <div className="aspect-[16/9] w-full overflow-hidden bg-zinc-100">
+                  <img
+                    src={bannerUrl}
+                    alt={ev.title}
+                    loading="lazy"
+                    onError={(e) => {
+                      if (e.currentTarget.src !== DEFAULT_EVENT_IMAGE) {
+                        e.currentTarget.src = DEFAULT_EVENT_IMAGE;
+                      }
+                    }}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                 </div>
                 <div className="space-y-3 p-6">
                   <div className="flex items-center justify-between text-xs font-medium text-teal-700">

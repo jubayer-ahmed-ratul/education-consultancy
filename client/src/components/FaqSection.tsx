@@ -44,7 +44,7 @@ export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
+    <section className="mx-auto w-11/12 max-w-[1440px] space-y-8 px-4 sm:px-6">
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-teal-700 ring-1 ring-inset ring-teal-200">
           <HelpCircle className="h-3.5 w-3.5" /> Frequently Asked Questions

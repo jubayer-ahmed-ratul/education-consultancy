@@ -93,7 +93,7 @@ export default function HomePage() {
 
       {/* Panoramic Rounded Hero Banner + Centered 4-Stat Strip */}
       <section className="bg-white pt-4 pb-8">
-        <div className="mx-auto max-w-11/12 px-4 sm:px-6">
+        <div className="mx-auto w-11/12 max-w-[1440px] ">
           <div className="relative overflow-hidden rounded-3xl bg-zinc-950 min-h-[440px] sm:min-h-[500px] flex items-center shadow-sm">
             {/* Background Landmark Photo */}
             <img
@@ -179,7 +179,7 @@ export default function HomePage() {
       />
 
       {/* Top Destinations — 4 Full-Bleed Image Cards */}
-      <section className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
+      <section className="mx-auto w-11/12 max-w-[1440px] space-y-8 px-4 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
@@ -251,7 +251,7 @@ export default function HomePage() {
       <FaqSection />
 
       {/* Conversion Banner */}
-      <section className="mx-auto max-w-11/12 px-4 sm:px-6">
+      <section className="mx-auto w-11/12 max-w-[1440px] ">
         <div className="rounded-2xl bg-zinc-950 p-8 text-white ring-1 ring-zinc-900 sm:p-12">
           <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
             <div className="max-w-2xl space-y-3">
@@ -289,7 +289,7 @@ export default function HomePage() {
       </section>
 
       {isLoading && (
-        <div className="mx-auto max-w-11/12 px-4 sm:px-6">
+        <div className="mx-auto w-11/12 max-w-[1440px] ">
           <div className="h-24 animate-pulse rounded-xl bg-zinc-200/70" />
         </div>
       )}

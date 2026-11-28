@@ -66,7 +66,7 @@ const SERVICES = [
 export function ServicesSection() {
   return (
     <section className="overflow-x-clip bg-[#F8FAFC] py-4">
-      <div className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-8 px-4 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-teal-700">

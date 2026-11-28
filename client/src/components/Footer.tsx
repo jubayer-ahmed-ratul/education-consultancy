@@ -39,7 +39,7 @@ export function Footer({ bundle, waHref }: FooterProps) {
 
   return (
     <footer className="overflow-hidden border-t border-zinc-800 bg-[#09090B] text-zinc-300">
-      <div className="mx-auto max-w-11/12 px-4 pt-14 pb-6 sm:px-6">
+      <div className="mx-auto w-11/12 max-w-[1440px] pt-14 pb-6">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12">
           {/* Brand Summary & Contact */}
           <div className="space-y-4 lg:col-span-5">

@@ -48,7 +48,7 @@ export function AboutPreviewSection({
 
   return (
     <section className="bg-white py-16 sm:py-20 border-y border-zinc-200/80">
-      <div className="mx-auto max-w-11/12 px-4 sm:px-6">
+      <div className="mx-auto w-11/12 max-w-[1440px] ">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
           {/* Left Column: Staggered 3-Image Collage + Bottom Trust & Milestone Badge Bar */}
           <div className="space-y-4 lg:col-span-6">

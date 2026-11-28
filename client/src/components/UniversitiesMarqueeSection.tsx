@@ -64,7 +64,7 @@ export function UniversitiesMarqueeSection({
   const bottomRow = universities.slice(midpoint).length > 0 ? universities.slice(midpoint) : topRow;
 
   return (
-    <section className="mx-auto max-w-11/12 space-y-8 px-4 sm:px-6">
+    <section className="mx-auto w-11/12 max-w-[1440px] space-y-8 px-4 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
         <div>
           <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">

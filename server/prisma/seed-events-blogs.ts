@@ -300,6 +300,29 @@ async function main() {
     });
   }
 
+  // Ensure any pre-existing published Events/Blogs without images also receive valid covers
+  await prisma.event.updateMany({
+    where: { eventBanner: { equals: null as never } },
+    data: {
+      eventBanner: {
+        publicId: 'studysphere/events/global-admissions-expo',
+        secureUrl:
+          'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1400&q=80',
+      },
+    },
+  });
+
+  await prisma.blog.updateMany({
+    where: { featuredImage: { equals: null as never } },
+    data: {
+      featuredImage: {
+        publicId: 'studysphere/blogs/study-abroad-default',
+        secureUrl:
+          'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=80',
+      },
+    },
+  });
+
   const [eventCount, blogCount] = await Promise.all([
     prisma.event.count({ where: { isPublished: true } }),
     prisma.blog.count({ where: { isPublished: true } }),

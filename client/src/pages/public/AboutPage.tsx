@@ -29,7 +29,7 @@ export default function AboutPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-11/12 space-y-4 px-4 py-10">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-4 px-4 py-10">
         <div className="h-8 w-56 animate-pulse rounded bg-zinc-200/70" />
         <div className="h-44 animate-pulse rounded-xl bg-zinc-200/70" />
       </div>
@@ -38,7 +38,7 @@ export default function AboutPage() {
   const about = data?.data;
 
   return (
-    <div className="mx-auto max-w-11/12 space-y-8 px-4 py-10 sm:px-6">
+    <div className="mx-auto w-11/12 max-w-[1440px] space-y-8 px-4 py-10 sm:px-6">
       <Helmet>
         <title>{about?.seoTitle || 'About Us'} â€” StudySphere</title>
         {about?.seoDescription && <meta name="description" content={about.seoDescription} />}

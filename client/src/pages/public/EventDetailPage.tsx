@@ -5,7 +5,11 @@ import { Helmet } from 'react-helmet-async';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { apiRequest } from '../../lib/api-client';
-import { resolveCmsImage, type BlogImageMeta } from './BlogsPage';
+import {
+  DEFAULT_EVENT_IMAGE,
+  resolveMediaUrl,
+  type CmsImageField,
+} from '../../lib/cms-image';
 import type { PublicEventItem } from './EventsPage';
 
 interface EventDetail {
@@ -14,7 +18,11 @@ interface EventDetail {
   slug: string;
   shortDescription: string;
   fullDescription: string;
-  eventBanner?: BlogImageMeta | string | null;
+  eventBanner?: CmsImageField;
+  coverImage?: CmsImageField;
+  imageUrl?: CmsImageField;
+  image?: CmsImageField;
+  bannerImage?: CmsImageField;
   eventDate: string;
   startTime: string;
   endTime: string;
@@ -60,7 +68,7 @@ export default function EventDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4 px-4 pt-28 pb-16 sm:px-6">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-4 pt-28 pb-16">
         <div className="h-8 w-56 animate-pulse rounded bg-zinc-200/70" />
         <div className="h-64 animate-pulse rounded-2xl bg-zinc-200/70" />
       </div>
@@ -69,7 +77,7 @@ export default function EventDetailPage() {
 
   if (error || !data?.data) {
     return (
-      <div className="mx-auto max-w-5xl space-y-3 px-4 pt-28 pb-16 text-center">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-3 pt-28 pb-16 text-center">
         <p className="text-sm font-medium text-rose-700">Event not found.</p>
         <Link to="/events" className="text-sm font-semibold text-teal-700 underline">
           Back to Events
@@ -79,10 +87,10 @@ export default function EventDetailPage() {
   }
 
   const ev = data.data;
-  const bannerUrl = resolveCmsImage(ev.eventBanner);
+  const bannerUrl = resolveMediaUrl(ev, DEFAULT_EVENT_IMAGE);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+    <div className="mx-auto w-11/12 max-w-[1440px] space-y-6 pt-28 pb-16">
       <Helmet>
         <title>{ev.seoTitle || ev.title} — StudySphere</title>
         <meta name="description" content={ev.seoDescription || ev.shortDescription} />
@@ -96,11 +104,18 @@ export default function EventDetailPage() {
       </Link>
 
       <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-950/10">
-        {bannerUrl && (
-          <div className="aspect-[21/9] w-full overflow-hidden bg-zinc-100">
-            <img src={bannerUrl} alt={ev.title} className="h-full w-full object-cover" />
-          </div>
-        )}
+        <div className="aspect-[21/9] max-h-[420px] w-full overflow-hidden bg-zinc-100">
+          <img
+            src={bannerUrl}
+            alt={ev.title}
+            onError={(e) => {
+              if (e.currentTarget.src !== DEFAULT_EVENT_IMAGE) {
+                e.currentTarget.src = DEFAULT_EVENT_IMAGE;
+              }
+            }}
+            className="h-full w-full object-cover"
+          />
+        </div>
 
         <div className="space-y-5 p-6 sm:p-8">
           <Badge variant="success" className="border-teal-200 bg-teal-50 uppercase text-teal-700">

@@ -88,7 +88,7 @@ export default function DestinationDetailPage() {
     return (
       <div className="space-y-8 pb-16">
         <div className="h-[380px] w-full animate-pulse bg-zinc-200/80 sm:h-[440px]" />
-        <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-11/12 max-w-[1440px] space-y-6 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-24 animate-pulse rounded-2xl bg-white ring-1 ring-zinc-950/10" />
@@ -102,7 +102,7 @@ export default function DestinationDetailPage() {
 
   if (error || !data?.data) {
     return (
-      <div className="mx-auto max-w-7xl space-y-4 px-4 py-20 text-center">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-4 px-4 py-20 text-center">
         <p className="text-base font-semibold text-zinc-950">Destination not found.</p>
         <Link to="/countries" className="text-sm font-semibold text-teal-600 hover:underline">
           Back to Destinations
@@ -188,7 +188,7 @@ export default function DestinationDetailPage() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
-          className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-10 pt-28 sm:px-6 lg:px-8"
+          className="relative z-10 mx-auto w-11/12 max-w-[1440px] pb-10 pt-28"
         >
           <div className="mb-3 flex items-center gap-1.5 text-sm text-white/80">
             <Link
@@ -221,7 +221,7 @@ export default function DestinationDetailPage() {
       </section>
 
       {/* Main Content Container */}
-      <div className="mx-auto max-w-7xl space-y-14 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto w-11/12 max-w-[1440px] space-y-14 px-4 py-12 sm:px-6 lg:px-8">
         {/* 1. Quick Key Facts Bar */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {keyFacts.map((fact) => {

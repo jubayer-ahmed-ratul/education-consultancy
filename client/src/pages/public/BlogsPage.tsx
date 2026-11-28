@@ -5,13 +5,12 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Input } from '../../components/ui/input';
 import { apiRequest } from '../../lib/api-client';
+import {
+  DEFAULT_BLOG_IMAGE,
+  resolveMediaUrl,
+  type CmsImageField,
+} from '../../lib/cms-image';
 import { prefetchBlog } from '../../lib/prefetch';
-
-export interface BlogImageMeta {
-  publicId?: string;
-  secureUrl?: string;
-  url?: string;
-}
 
 export interface PublicBlogItem {
   id: string;
@@ -21,13 +20,10 @@ export interface PublicBlogItem {
   category: string;
   author: string;
   publishedAt: string | null;
-  featuredImage?: BlogImageMeta | string | null;
-}
-
-export function resolveCmsImage(img?: BlogImageMeta | string | null): string | null {
-  if (!img) return null;
-  if (typeof img === 'string') return img;
-  return img.secureUrl || img.url || null;
+  featuredImage?: CmsImageField;
+  coverImage?: CmsImageField;
+  imageUrl?: CmsImageField;
+  image?: CmsImageField;
 }
 
 export default function BlogsPage() {
@@ -43,7 +39,7 @@ export default function BlogsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+    <div className="mx-auto w-11/12 max-w-[1440px] space-y-8 pt-28 pb-16">
       <Helmet>
         <title>Blogs &amp; Study Guides — StudySphere</title>
       </Helmet>
@@ -82,7 +78,7 @@ export default function BlogsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data.data.map((b) => {
-            const coverUrl = resolveCmsImage(b.featuredImage);
+            const coverUrl = resolveMediaUrl(b, DEFAULT_BLOG_IMAGE);
             return (
               <Link
                 key={b.id}
@@ -93,19 +89,18 @@ export default function BlogsPage() {
                 className="group flex flex-col justify-between overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-950/10 transition-all hover:shadow-md hover:ring-teal-600/40"
               >
                 <div>
-                  <div className="aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-[#09090B] via-[#0B1F3A] to-[#0D9488]">
-                    {coverUrl ? (
-                      <img
-                        src={coverUrl}
-                        alt={b.title}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-teal-300/60">
-                        <BookOpen className="h-10 w-10" />
-                      </div>
-                    )}
+                  <div className="aspect-[16/9] w-full overflow-hidden bg-zinc-100">
+                    <img
+                      src={coverUrl}
+                      alt={b.title}
+                      loading="lazy"
+                      onError={(e) => {
+                        if (e.currentTarget.src !== DEFAULT_BLOG_IMAGE) {
+                          e.currentTarget.src = DEFAULT_BLOG_IMAGE;
+                        }
+                      }}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </div>
                   <div className="space-y-2 p-5">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-teal-700">
